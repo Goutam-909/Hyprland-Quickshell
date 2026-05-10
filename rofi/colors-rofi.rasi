@@ -1,0 +1,15 @@
+/**
+ * Matugen Color Template for Rofi
+ * Place this in: ~/.config/rofi/colors-rofi.rasi
+ * 
+ * Generated colors will be automatically applied
+ **/
+
+* {
+    background:     #1a1111ff;
+    background-alt: #1a1111ff;
+    foreground:     #f0dedeff;
+    selected:       #ffb3b3ff;
+    active:         #e6bdbcff;
+    urgent:         #ffb4abff;
+}

@@ -1,0 +1,175 @@
+{
+	"hyprland/workspaces": {
+        "format": "{icon}",
+        "on-click": "activate",
+        "all-outputs": true,
+        "persistent-workspaces": {
+            "*": [1, 2, 3]
+        },
+        "format-icons": {
+            "default": "󰫣",
+            "active": "󰫢"
+		},
+        "on-scroll-up": "hyprctl dispatch workspace -1",
+        "on-scroll-down": "hyprctl dispatch workspace +1",
+        "disable-scroll": false
+	},
+
+	"clock": {
+		"format": "{:%I:%M %p}",
+		"tooltip-format": "<tt><small>{calendar}</small></tt>",
+		"calendar": {
+			"format": {
+				"months": "<span color='#ffead3'><b>{}</b></span>",
+				"weekdays": "<span color='#ffcc66'><b>{}</b></span>",
+				"today": "<span color='#ffcc66'><b><u>{}</u></b></span>"
+			}
+		}
+	},
+
+	"battery": {
+		"states": {
+			"good": 95,
+			"warning": 30,
+			"critical": 20
+		},
+		"format": "{icon} {capacity}   ",
+		"format-charging": " {capacity}  ",
+        "format-plugged": " {capacity}   ",
+        "format-icons": ["󱢠 󱢠 󱢠 ", "󱢠 󱢠 󰛞 ", "󱢠 󱢠 󰛞 ", "󱢠 󱢠 󰋑 ", "󱢠 󰛞 󰋑 ", "󱢠 󰛞 󰋑 ", "󱢠 󰋑 󰋑 ", "󰛞 󰋑 󰋑 ", "󰛞 󰋑 󰋑 ", "󰋑 󰋑 󰋑 "],
+		"on-click": "bash -c 'qs -c music ipc call battery toggle'"
+	},
+
+	"network": {
+		"format-wifi": "    {signalStrength}%",
+		"format-ethernet": "{ipaddr}/{cidr}",
+		"format-linked": "{ifname} (No IP)",
+		"format-disconnected": "󰖪 ",
+        "on-click": "plasmawindowed org.kde.plasma.networkmanagement",
+        "tooltip-format":"Network: <big><b>{essid}</b></big>\nSignal strength: <b>{signaldBm}dBm ({bandwidthDownBytes})</b>\nFrequency: <b>{frequency}MHz</b>\nInterface: <b>{ifname}</b>"
+    },
+
+	"bluetooth": {
+		"format": "󰂯    {status}",
+		"format-disabled": " off",
+		"format-connected": " {num_connections}",
+		"tooltip-format": "{device_alias}",
+		"tooltip-format-connected": " {device_enumerate}",
+		"tooltip-format-enumerate-connected": "{device_alias}",
+		"on-click": "kcmshell6 kcm_bluetooth"
+	},
+
+    "group/custom-group": {
+        "orientation": "inherit",
+        "drawer": {
+            "transition-duration": 500,
+            "transition-left-to-right": false
+        },
+        "modules": [
+            "battery",
+            "bluetooth",
+            "network"
+        ]
+    },
+
+    "group/music": {
+        "orientation": "inherit",
+        "drawer": {
+            "transition-duration": 500,
+            "transition-left-to-right": true
+        },
+        "modules": [
+            "pulseaudio",
+            "mpris"
+        ]
+    },
+
+   "mpd": {
+          "format": "{stateIcon} {consumeIcon}{randomIcon}{repeatIcon}{singleIcon} {title:.25} ({elapsedTime:%M:%S}/{totalTime:%M:%S}) ",
+	      "format-disconnected": "Disconnected ",
+	      "format-stopped": "{consumeIcon}{randomIcon}{repeatIcon}{singleIcon}Stopped ",
+	      "interval": 1000,
+	      "consume-icons": {
+	      "on": " "
+	      },
+	"random-icons": {
+		"off": "<span color=\"#f53c3c\"></span> ",
+		"on": " "
+	},
+	"repeat-icons": {
+		"on": " "
+	},
+	"single-icons": {
+		"on": "1 "
+	},
+	"state-icons": {
+		"paused": "",
+		"playing": ""
+	},
+	"tooltip-format": "MPD (connected)",
+	"tooltip-format-disconnected": "MPD (disconnected)",
+	"on-click": "eww list-windows | grep -q music-widget && eww close music-widget || eww open music-widget"
+
+},
+
+   "pulseaudio": {
+    "format": "{icon} {volume}%  ",
+    "format-bluetooth": "󰂱 {volume}%",
+    "format-muted": "󰖁",
+    "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+    "on-click": "pavucontrol -t 3",
+    "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%+",
+    "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%-",
+    "scroll-step": 1,
+
+    "ignored-sinks": ["Easy Effects Sink"],
+    "format-icons": {
+      "headphone": "",
+      "hands-free": "",
+      "headset": "󰋎",
+      "phone": "",
+      "portable": "",
+      "car": "",
+      "default": ["󰖀", "󰕾"]
+    },
+    "tooltip-format": "Volume: {volume}%"
+  },
+
+"mpris": {
+    "interval": 1000,
+    "format": "{player_icon} <i>{dynamic}</i>",
+    "on-click": "eww list-windows | grep -q music-widget && eww close music-widget || eww open music-widget",
+    "on-click-right": "playerctl next",
+    "scroll-step": 5.0,
+    "on-scroll-up": "$HOME/.config/waybar/scripts/Volume.sh --inc",
+    "on-scroll-down": "$HOME/.config/waybar/scripts/Volume.sh --dec",
+    "smooth-scrolling-threshold": 1,
+    "tooltip": false,
+    "tooltip-format": "{status_icon} {dynamic}\nLeft Click: previous\nMid Click: Pause\nRight Click: Next",
+    "player-icons": {
+        "chromium": "",
+        "default": "",
+        "firefox": "",
+        "kdeconnect": "",
+        "mopidy": "",
+        "mpv": "󰐹",
+        "spotify": "",
+        "vlc": "󰕼"
+    },
+    "status-icons": {
+        "paused": "󰐎",
+        "playing": "",
+        "stopped": ""
+    },
+    "max-length": 30
+},
+
+"custom/system-pill": {
+    "exec": "~/.config/waybar/scripts/system-pill.sh",
+    "return-type": "json",
+    "interval": 2,
+    "format": "{}",
+    "tooltip": false,
+    "on-click": "bash -c 'qs -c music ipc call controlcenter toggle'"
+  }
+}

@@ -1,0 +1,166 @@
+@import "../../.config/uchiha/colors/colors-waybar.css";
+@define-color main-color @primary;
+
+* {
+    border: none;
+    border-radius: 0px;
+    font-family: "Ndot55, DepartureMono Nerd Font";
+    font-weight: bold;
+    font-size: 18px;
+    min-height: 0;
+}
+
+window#waybar {
+    border-radius: 20px;
+    background: alpha(@background, 0.5);
+    border: 1px solid alpha(@primary, 0.7);
+}
+
+tooltip {
+    background: alpha(@background, 0.9);
+    border-radius: 10px;
+    border: 2px solid alpha(@primary, 0.3);
+}
+
+tooltip label {
+    color: @foreground;
+}
+
+#workspaces {
+background: alpha(@background, 0.3);
+border-radius: 20px;
+margin-top: 4px;
+margin-bottom: 4px;
+}
+
+#workspaces button {
+padding: 0px;
+color: alpha(@foreground, 0.5);
+background: transparent;
+border-radius: 10px;
+margin-top: 3px;
+margin-bottom: 3px;
+padding-left: 3px;
+padding-right: 3px;
+animation: gradient_f 20s ease-in infinite;
+transition: all 0.4s cubic-bezier(0.55, -0.68, 0.48, 1.682);
+}
+
+#workspaces button.active {
+background: alpha(@primary-container, 0.4);
+color: @primary;
+border-radius: 20px;
+transition: color 0.5s;
+margin-left: 3px;
+padding-left: 15px;
+padding-right: 15px;
+margin-right: 3px;
+animation: gradient_f 20s ease-in infinite;
+transition: all 0.8s cubic-bezier(0.55, -0.68, 0.48, 1.682);
+}
+
+#workspaces button.focused {
+color: @secondary;
+background: transparent;
+}
+
+#workspaces button.urgent {
+color: @error;
+background: transparent;
+}
+
+#workspaces button:hover {
+background: transparent;
+color: @primary;
+}
+
+#window,
+
+#tray,
+#mpd,
+#pulseaudio,
+#battery,
+#network,
+#memory,
+#bluetooth,
+#workspaces {
+padding: 0px 14px 0px 14px;
+}
+
+#window {
+margin-left: 60px;
+margin-right: 60px;
+background: alpha(@background, 0.3);
+border-radius: 10px;
+color: @primary;
+}
+
+
+#mpd,
+#pulseaudio {
+color: @primary;
+background: transparent;
+}
+
+#network {
+color: @primary;
+background: transparent;
+}
+
+#bluetooth {
+color: @primary;
+background: transparent;
+}
+
+#battery {
+color: @primary;
+background: transparent;
+}
+
+#memory {
+color: @primary;
+background: transparent;
+}
+
+#calendar {
+font-family: "DepartureMono Nerd Font";
+}
+
+/* System Pill Widget - Uses matugen colors */
+#custom-system-pill {
+color: @primary;
+background: alpha(@background, 0.3);
+border-radius: 20px;
+padding: 4px 14px;
+margin: 4px 0px;
+min-height: 26px;
+}
+
+/* Hover effect - lighten with primary color */
+#custom-system-pill:hover {
+background: alpha(@primary-container, 0.4);
+}
+
+/* Active/clicked effect */
+#custom-system-pill:active {
+background: alpha(@primary-container, 0.6);
+}
+
+#clock {
+color: @primary;
+background: alpha(@background, 0.3);
+border-radius: 20px;
+padding: 4px 14px;
+margin: 4px 0px;
+min-height: 26px;
+}
+
+/* Hover effect - lighten with primary color */
+#clock:hover {
+background: alpha(@primary-container, 0.4);
+}
+
+/* Active/clicked effect */
+#clock:active {
+background: alpha(@primary-container, 0.6);
+}

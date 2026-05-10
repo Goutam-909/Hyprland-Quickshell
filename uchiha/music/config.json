@@ -1,0 +1,76 @@
+{
+  "objectName": "",
+  "running": false,
+  "processId": null,
+  "command": [],
+  "workingDirectory": "/home/goutam",
+  "environment": {},
+  "clearEnvironment": false,
+  "stdout": null,
+  "stderr": null,
+  "stdinEnabled": false,
+  "dock": {
+    "enabled": true,
+    "height": 60,
+    "hoverRegionHeight": 2,
+    "hoverToReveal": true,
+    "pinnedApps": [
+      "org.kde.dolphin",
+      "kitty",
+      "google-chrome",
+      "brave-browser",
+      "firefox",
+      "spotify",
+      "org.kde.kwrite",
+      "proton.vpn.app.gtk",
+      "webapp-musicyt8342",
+      "webapp-whatsapp2296"
+    ],
+    "ignoredAppRegexes": [],
+    "mode": "default"
+  },
+  "bar": {
+    "barVisible": true,
+    "barMode": 2,
+    "widgetStyle": 0,
+    "showDateTime": true,
+    "showMediaplayer": true,
+    "showWorkspaces": true,
+    "showSystemTray": true,
+    "showBattery": true,
+    "showPfp": true,
+    "wsShown": 8,
+    "wsDynamic": false,
+    "wsShowNumbers": false,
+    "wsAlwaysShowNumbers": false,
+    "wsShowAppIcons": true
+  },
+  "appearance": {
+    "activeTheme": "default",
+    "themeMode": "dark",
+    "matugenScheme": "scheme-content",
+    "backgroundTransparency": 0,
+    "contentTransparency": 0
+  },
+  "clock": {
+    "clockStyle": "background",
+    "clockPosMode": "auto",
+    "clockPosX": 0.05,
+    "clockPosY": 0.3,
+    "bgClockColor": "",
+    "bgClockM3Color": "",
+    "digitalClockColor": "",
+    "digitalClockM3Color": ""
+  },
+  "background": {
+    "wallpaperPath": "/home/goutam/Pictures/wallpapers/Wall-377.jpg",
+    "thumbnailPath": "",
+    "sourceColors": [
+      "#2e6480",
+      "#dfc594",
+      "#97b5a8",
+      "#a59492"
+    ],
+    "sourceColorIndex": 0
+  }
+}
