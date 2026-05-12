@@ -88,6 +88,18 @@ PanelWindow {
                 Visibilities.setActiveModule("");
             }
         }
+
+        // Mouse wheel on backdrop switches workspaces
+        WheelHandler {
+            target: backdrop
+            onWheel: event => {
+                if (event.angleDelta.y < 0)
+                    Hyprland.dispatch(`hl.dsp.focus({ workspace = "r+1" })`);
+                else if (event.angleDelta.y > 0)
+                    Hyprland.dispatch(`hl.dsp.focus({ workspace = "r-1" })`);
+            }
+            acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
+        }
     }
 
     // Main content column (search + overview)
@@ -199,13 +211,7 @@ PanelWindow {
 
                     onTabPressed: {
                         if (searchInput.text.length === 0) {
-                            const current = Hyprland.focusedWorkspace?.id || 1;
-                            const next = current + 1;
-                            if (next > Config.workspaces.shown) {
-                                Hyprland.dispatch("workspace 1");
-                            } else {
-                                Hyprland.dispatch("workspace r+1");
-                            }
+                            Hyprland.dispatch(`hl.dsp.focus({ workspace = "r+1" })`);
                         } else if (overviewLoader.item) {
                             overviewLoader.item.selectNextMatch();
                         }
@@ -213,13 +219,7 @@ PanelWindow {
 
                     onShiftTabPressed: {
                         if (searchInput.text.length === 0) {
-                            const current = Hyprland.focusedWorkspace?.id || 1;
-                            const prev = current - 1;
-                            if (prev < 1) {
-                                Hyprland.dispatch("workspace " + Config.workspaces.shown);
-                            } else {
-                                Hyprland.dispatch("workspace r-1");
-                            }
+                            Hyprland.dispatch(`hl.dsp.focus({ workspace = "r-1" })`);
                         } else if (overviewLoader.item) {
                             overviewLoader.item.selectPrevMatch();
                         }
@@ -250,13 +250,7 @@ PanelWindow {
 
                     onLeftPressed: {
                         if (searchInput.text.length === 0) {
-                            const current = Hyprland.focusedWorkspace?.id || 1;
-                            const prev = current - 1;
-                            if (prev < 1) {
-                                Hyprland.dispatch("workspace " + Config.workspaces.shown);
-                            } else {
-                                Hyprland.dispatch("workspace r-1");
-                            }
+                            Hyprland.dispatch(`hl.dsp.focus({ workspace = "r-1" })`);
                         } else if (overviewLoader.item) {
                             overviewLoader.item.selectPrevMatch();
                         }
@@ -264,13 +258,7 @@ PanelWindow {
 
                     onRightPressed: {
                         if (searchInput.text.length === 0) {
-                            const current = Hyprland.focusedWorkspace?.id || 1;
-                            const next = current + 1;
-                            if (next > Config.workspaces.shown) {
-                                Hyprland.dispatch("workspace 1");
-                            } else {
-                                Hyprland.dispatch("workspace r+1");
-                            }
+                            Hyprland.dispatch(`hl.dsp.focus({ workspace = "r+1" })`);
                         } else if (overviewLoader.item) {
                             overviewLoader.item.selectNextMatch();
                         }

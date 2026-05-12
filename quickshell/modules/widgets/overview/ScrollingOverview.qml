@@ -16,7 +16,9 @@ Item {
 
     // Config values
     readonly property real scale: Config.overview.scale
-    readonly property int totalWorkspaces: Config.overview.rows * Config.overview.columns
+    // Always show at least configuredWorkspaces, and always extend 10 beyond the active workspace
+    readonly property int configuredWorkspaces: Config.overview.rows * Config.overview.columns
+    readonly property int totalWorkspaces: Math.max(configuredWorkspaces, activeWorkspaceId + 10)
     readonly property int visibleWorkspaces: 3  // Show 3 workspaces at a time in viewport
     readonly property real workspaceSpacing: Config.overview.workspaceSpacing
     readonly property real workspacePadding: 4
@@ -125,7 +127,7 @@ Item {
             return;
         Visibilities.setActiveModule("", true);
         Qt.callLater(() => {
-            Hyprland.dispatch(`focuswindow address:${win.address}`);
+            Hyprland.dispatch(`hl.dsp.focus({ window = "address:${win.address}" })`);
         });
     }
 

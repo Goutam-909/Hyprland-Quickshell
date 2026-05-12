@@ -265,7 +265,7 @@ Item {
             TapHandler {
                 acceptedButtons: Qt.LeftButton
                 onDoubleTapped: {
-                    Hyprland.dispatch(`workspace ${root.workspaceId}`);
+                    Hyprland.dispatch(`hl.dsp.focus({ workspace = ${root.workspaceId} })`);
                     Visibilities.setActiveModule("", true);
                 }
             }
@@ -348,15 +348,19 @@ Item {
                         }
                     }
 
+                    // Suppress animation until first layout is complete to prevent flicker
+                    property bool ready: false
+                    Component.onCompleted: Qt.callLater(() => { ready = true; })
+
                     Behavior on x {
-                        enabled: Config.animDuration > 0 && !windowDelegate.dragging && !windowDelegate.useOverridePosition
+                        enabled: Config.animDuration > 0 && !windowDelegate.dragging && !windowDelegate.useOverridePosition && windowDelegate.ready
                         NumberAnimation {
                             duration: Config.animDuration
                             easing.type: Easing.OutQuart
                         }
                     }
                     Behavior on y {
-                        enabled: Config.animDuration > 0 && !windowDelegate.dragging && !windowDelegate.useOverridePosition
+                        enabled: Config.animDuration > 0 && !windowDelegate.dragging && !windowDelegate.useOverridePosition && windowDelegate.ready
                         NumberAnimation {
                             duration: Config.animDuration
                             easing.type: Easing.OutQuart
@@ -547,17 +551,17 @@ Item {
                                             // Calculate position for floating window in target workspace
                                             const draggedX = windowDelegate.x;
                                             const draggedY = windowDelegate.y;
-                                            
+
                                             const workspaceGlobalPos = windowsContainer.mapToItem(root.dragOverlay, 0, 0);
                                             const relativeX = draggedX - workspaceGlobalPos.x;
                                             const relativeY = draggedY - workspaceGlobalPos.y;
-                                            
+
                                             const workspaceX = relativeX - root.horizontalScrollOffset - root.viewportOffset;
                                             const workspaceY = relativeY;
-                                            
+
                                             const monitorWidth = (monitorData?.width || 1920) / (monitorData?.scale || 1.0);
                                             const monitorHeight = (monitorData?.height || 1080) / (monitorData?.scale || 1.0);
-                                            
+
                                             let adjustedMonitorWidth = monitorWidth;
                                             let adjustedMonitorHeight = monitorHeight;
                                             if (barPosition === "left" || barPosition === "right") {
@@ -566,27 +570,27 @@ Item {
                                             if (barPosition === "top" || barPosition === "bottom") {
                                                 adjustedMonitorHeight -= barReserved;
                                             }
-                                            
+
                                             const actualX = workspaceX / scale_;
                                             const actualY = workspaceY / scale_;
-                                            
+
                                             const percentageX = Math.round((actualX / adjustedMonitorWidth) * 100);
                                             const percentageY = Math.round((actualY / adjustedMonitorHeight) * 100);
-                                            
+
                                             // Move to workspace and set position
-                                            Hyprland.dispatch(`movetoworkspacesilent ${targetWs}, address:${windowDelegate.windowData?.address}`);
-                                            Hyprland.dispatch(`movewindowpixel exact ${percentageX}% ${percentageY}%, address:${windowDelegate.windowData?.address}`);
-                                            
+                                            Hyprland.dispatch(`hl.dsp.window.move({ workspace = ${targetWs}, follow = false, window = "address:${windowDelegate.windowData?.address}" })`);
+                                            Hyprland.dispatch(`hl.dsp.window.move({ x = "${Math.round(percentageX * root.workspaceWidth / 100)}", y = "${Math.round(percentageY * root.workspaceHeight / 100)}", window = "address:${windowDelegate.windowData?.address}" })`);
+
                                             // Force immediate window data update
                                             HyprlandData.updateWindowList();
                                         } else {
                                             // Just move workspace without repositioning for tiled windows
-                                            Hyprland.dispatch(`movetoworkspacesilent ${targetWs}, address:${windowDelegate.windowData?.address}`);
-                                            
+                                            Hyprland.dispatch(`hl.dsp.window.move({ workspace = ${targetWs}, follow = false, window = "address:${windowDelegate.windowData?.address}" })`);
+
                                             // Force immediate window data update
                                             HyprlandData.updateWindowList();
                                         }
-                                        
+
                                         // Restore original parent and reset position
                                         if (windowDelegate.originalParent) {
                                             windowDelegate.parent = windowDelegate.originalParent;
@@ -594,30 +598,30 @@ Item {
                                         }
                                         windowDelegate.x = windowDelegate.initX;
                                         windowDelegate.y = windowDelegate.initY;
-                                        
+
                                     } else if (windowDelegate.windowData?.floating && (windowDelegate.x !== windowDelegate.initX || windowDelegate.y !== windowDelegate.initY)) {
                                         // Dropped on same workspace and window is floating - reposition it
                                         // The window is currently in the drag overlay with global coordinates
-                                        
+
                                         // Store current drag position
                                         const draggedX = windowDelegate.x;
                                         const draggedY = windowDelegate.y;
-                                        
+
                                         // Get the workspace container position
                                         const workspaceGlobalPos = windowsContainer.mapToItem(root.dragOverlay, 0, 0);
-                                        
+
                                         // Calculate position relative to workspace
                                         const relativeX = draggedX - workspaceGlobalPos.x;
                                         const relativeY = draggedY - workspaceGlobalPos.y;
-                                        
+
                                         // Remove horizontal scroll offset to get actual position in workspace
                                         const workspaceX = relativeX - root.horizontalScrollOffset - root.viewportOffset;
                                         const workspaceY = relativeY;
-                                        
+
                                         // Convert to percentage of workspace dimensions (in scaled space)
                                         const monitorWidth = (monitorData?.width || 1920) / (monitorData?.scale || 1.0);
                                         const monitorHeight = (monitorData?.height || 1080) / (monitorData?.scale || 1.0);
-                                        
+
                                         // Adjust for bar reserved space
                                         let adjustedMonitorWidth = monitorWidth;
                                         let adjustedMonitorHeight = monitorHeight;
@@ -627,37 +631,37 @@ Item {
                                         if (barPosition === "top" || barPosition === "bottom") {
                                             adjustedMonitorHeight -= barReserved;
                                         }
-                                        
+
                                         // Convert from scaled overview space to actual position
                                         const actualX = workspaceX / scale_;
                                         const actualY = workspaceY / scale_;
-                                        
+
                                         // Calculate percentage
                                         const percentageX = Math.round((actualX / adjustedMonitorWidth) * 100);
                                         const percentageY = Math.round((actualY / adjustedMonitorHeight) * 100);
-                                        
+
                                         // Dispatch movewindowpixel command
-                                        Hyprland.dispatch(`movewindowpixel exact ${percentageX}% ${percentageY}%, address:${windowDelegate.windowData?.address}`);
-                                        
+                                        Hyprland.dispatch(`hl.dsp.window.move({ x = "${Math.round(percentageX * root.workspaceWidth / 100)}", y = "${Math.round(percentageY * root.workspaceHeight / 100)}", window = "address:${windowDelegate.windowData?.address}" })`);
+
                                         // Force immediate window data update
                                         HyprlandData.updateWindowList();
-                                        
+
                                         // Restore original parent
                                         if (windowDelegate.originalParent) {
                                             windowDelegate.parent = windowDelegate.originalParent;
                                             windowDelegate.originalParent = null;
                                         }
-                                        
+
                                         // Set override position for immediate visual update
                                         // Calculate what baseX/baseY should be at the dropped position
                                         windowDelegate.overrideBaseX = relativeX;
                                         windowDelegate.overrideBaseY = relativeY;
                                         windowDelegate.useOverridePosition = true;
-                                        
+
                                         // Force position to dropped location
                                         windowDelegate.x = relativeX;
                                         windowDelegate.y = relativeY;
-                                        
+
                                         // Start timer to clear override
                                         resetOverrideTimer.restart();
                                     } else {
@@ -682,9 +686,9 @@ Item {
                             if (!windowDelegate.windowData)
                                 return;
                             if (mouse.button === Qt.LeftButton && !windowDelegate.dragging) {
-                                Hyprland.dispatch(`focuswindow address:${windowDelegate.windowData.address}`);
+                                Hyprland.dispatch(`hl.dsp.focus({ window = "address:${windowDelegate.windowData.address}" })`);
                             } else if (mouse.button === Qt.MiddleButton) {
-                                Hyprland.dispatch(`closewindow address:${windowDelegate.windowData.address}`);
+                                Hyprland.dispatch(`hl.dsp.window.close({ window = "address:${windowDelegate.windowData.address}" })`);
                             }
                         }
 
@@ -694,7 +698,7 @@ Item {
                             if (mouse.button === Qt.LeftButton) {
                                 Visibilities.setActiveModule("", true);
                                 Qt.callLater(() => {
-                                    Hyprland.dispatch(`focuswindow address:${windowDelegate.windowData.address}`);
+                                    Hyprland.dispatch(`hl.dsp.focus({ window = "address:${windowDelegate.windowData.address}" })`);
                                 });
                             }
                         }

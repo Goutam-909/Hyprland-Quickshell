@@ -165,13 +165,13 @@ ShellRoot {
         LockScreen {}
     }
 
-    HyprlandConfig {
-        id: hyprlandConfig
-    }
+   // HyprlandConfig {
+     //   id: hyprlandConfig
+   // }
 
-    HyprlandKeybinds {
-        id: hyprlandKeybinds
-    }
+    //HyprlandKeybinds {
+     //   id: hyprlandKeybinds
+   // }
 
     // Screenshot tool
     Variants {

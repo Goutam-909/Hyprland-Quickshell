@@ -3,7 +3,7 @@
         "assistant": {
             "argument": "ambxst run assistant",
             "dispatcher": "exec",
-            "key": "V",
+            "key": "A",
             "modifiers": [
                 "SUPER"
             ]
@@ -11,7 +11,7 @@
         "clipboard": {
             "argument": "ambxst run clipboard",
             "dispatcher": "exec",
-            "key": "C",
+            "key": "V",
             "modifiers": [
                 "SUPER"
             ]
@@ -36,8 +36,8 @@
         "launcher": {
             "argument": "ambxst run launcher",
             "dispatcher": "exec",
-            "flags": "",
-            "key": "A",
+            "flags": "r",
+            "key": "Super_L",
             "modifiers": [
                 "SUPER"
             ]
@@ -93,7 +93,7 @@
                 "argument": "ambxst run powermenu",
                 "dispatcher": "exec",
                 "flags": "",
-                "key": "BACKSPACE",
+                "key": "ESCAPE",
                 "modifiers": [
                     "SUPER"
                 ]
@@ -160,7 +160,7 @@
         "wallpapers": {
             "argument": "ambxst run wallpapers",
             "dispatcher": "exec",
-            "key": "SPACE",
+            "key": "COMMA",
             "modifiers": [
                 "SUPER"
             ]
@@ -183,7 +183,7 @@
             "enabled": true,
             "keys": [
                 {
-                    "key": "Q",
+                    "key": "C",
                     "modifiers": [
                         "SUPER"
                     ]
@@ -732,6 +732,31 @@
         {
             "actions": [
                 {
+                    "argument": "e-1",
+                    "compositor": {
+                        "layouts": [
+                        ],
+                        "type": "hyprland"
+                    },
+                    "dispatcher": "workspace",
+                    "flags": ""
+                }
+            ],
+            "enabled": true,
+            "keys": [
+                {
+                    "key": "Z",
+                    "modifiers": [
+                        "SUPER",
+                        "SHIFT"
+                    ]
+                }
+            ],
+            "name": "Previous Occupied Workspace"
+        },
+        {
+            "actions": [
+                {
                     "argument": "e+1",
                     "compositor": {
                         "layouts": [
@@ -757,14 +782,14 @@
         {
             "actions": [
                 {
-                    "argument": "",
+                    "argument": "-1",
                     "compositor": {
                         "layouts": [
                         ],
                         "type": "hyprland"
                     },
-                    "dispatcher": "movewindow",
-                    "flags": "m"
+                    "dispatcher": "workspace",
+                    "flags": ""
                 }
             ],
             "enabled": true,
@@ -781,14 +806,14 @@
         {
             "actions": [
                 {
-                    "argument": "",
+                    "argument": "+1",
                     "compositor": {
                         "layouts": [
                         ],
                         "type": "hyprland"
                     },
-                    "dispatcher": "resizewindow",
-                    "flags": "m"
+                    "dispatcher": "workspace",
+                    "flags": ""
                 }
             ],
             "enabled": true,
@@ -2162,30 +2187,6 @@
                 }
             ],
             "name": "Move Column To Workspace 10"
-        },
-        {
-            "actions": [
-                {
-                    "argument": "ambxst run mediawindow",
-                    "compositor": {
-                        "layouts": [
-                        ],
-                        "type": "hyprland"
-                    },
-                    "dispatcher": "exec",
-                    "flags": ""
-                }
-            ],
-            "enabled": true,
-            "keys": [
-                {
-                    "key": "M",
-                    "modifiers": [
-                        "SUPER"
-                    ]
-                }
-            ],
-            "name": "MediaPlayerWindow"
         }
     ],
     "defaultAmbxstBinds": {

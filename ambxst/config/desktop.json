@@ -1,5 +1,5 @@
 {
-    "enabled": true,
+    "enabled": false,
     "iconsEnabled": false,
     "iconSize": 40,
     "spacingVertical": 16,
@@ -24,8 +24,8 @@
             "y": 8
         }
     ],
-    "clockEnabled": true,
-    "clockX": 234,
-    "clockY": 818,
+    "clockEnabled": false,
+    "clockX": 0,
+    "clockY": 0,
     "clockColor": "auto"
 }

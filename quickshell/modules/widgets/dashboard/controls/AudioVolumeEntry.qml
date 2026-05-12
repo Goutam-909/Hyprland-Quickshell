@@ -24,26 +24,42 @@ Item {
     }
 
     readonly property bool isMuted: root.node?.audio?.muted ?? false
-    readonly property real volume: root.node?.audio?.volume ?? 0
-    property real lastSetVolume: volume
+    readonly property real volume:  root.node?.audio?.volume ?? 0
 
+    // Guard: true while we are pushing a PipeWire value into the slider.
+    // Prevents onValueChanged from echoing the value back to PipeWire.
+    property bool syncingFromPipewire: false
+
+    // ── Sync slider ← PipeWire (external changes) ────────────────────────────
+    Connections {
+        target: root.node?.audio ?? null
+        ignoreUnknownSignals: true
+
+        function onVolumeChanged() {
+            if (!root.node?.audio) return;
+            root.syncingFromPipewire = true;
+            volumeSlider.value = root.node.audio.volume;
+            root.syncingFromPipewire = false;
+        }
+    }
+
+    // ── UI ───────────────────────────────────────────────────────────────────
     ColumnLayout {
         anchors.fill: parent
         spacing: 4
 
-        // First row: Icon + Slider
+        // Row 1: Mute button + slider
         RowLayout {
             Layout.fillWidth: true
             spacing: 8
 
-            // Mute button with icon
             Button {
                 id: muteButton
                 flat: true
-                implicitWidth: 32
+                implicitWidth:  32
                 implicitHeight: 32
                 Layout.preferredWidth: 32
-                Layout.maximumWidth: 32
+                Layout.maximumWidth:   32
                 Layout.fillWidth: false
 
                 background: StyledRect {
@@ -55,21 +71,17 @@ Item {
                     Text {
                         anchors.centerIn: parent
                         text: {
-                            if (root.isMuted)
-                                return Icons.speakerSlash;
-                            if (root.icon)
-                                return root.icon;
+                            if (root.isMuted) return Icons.speakerSlash;
+                            if (root.icon)    return root.icon;
                             return Icons.speakerHigh;
                         }
-                        font.family: Icons.font
+                        font.family:    Icons.font
                         font.pixelSize: 16
                         color: root.isMuted ? Colors.error : Colors.overBackground
 
                         Behavior on color {
                             enabled: Config.animDuration > 0
-                            ColorAnimation {
-                                duration: Config.animDuration / 2
-                            }
+                            ColorAnimation { duration: Config.animDuration / 2 }
                         }
                     }
                 }
@@ -86,22 +98,25 @@ Item {
                 }
             }
 
-            // Volume slider
             StyledSlider {
                 id: volumeSlider
                 Layout.fillWidth: true
                 Layout.preferredHeight: 20
+
+                // Initialise to current volume; kept in sync via the
+                // Connections block above (NOT a live binding, to avoid loop).
                 value: root.volume
                 scroll: false
+
                 progressColor: {
-                    if (root.isMuted)
-                        return Colors.outline;
-                    if (Audio.protectionTriggered && root.isMainDevice)
-                        return Colors.warning;
+                    if (root.isMuted) return Colors.outline;
+                    if (Audio.protectionTriggered && root.isMainDevice) return Colors.warning;
                     return Styling.srItem("overprimary");
                 }
 
+                // Sync PipeWire ← slider (only real user drags reach here)
                 onValueChanged: {
+                    if (root.syncingFromPipewire) return;
                     if (root.node?.audio && Math.abs(value - root.volume) > 0.001) {
                         Audio.setNodeVolume(root.node, value);
                     }
@@ -109,36 +124,33 @@ Item {
 
                 Behavior on progressColor {
                     enabled: Config.animDuration > 0
-                    ColorAnimation {
-                        duration: Config.animDuration / 2
-                    }
+                    ColorAnimation { duration: Config.animDuration / 2 }
                 }
             }
         }
 
-        // Second row: Name + Separator + Percentage
+        // Row 2: Name + separator + protection icon + percentage
         RowLayout {
             Layout.fillWidth: true
             spacing: 8
 
-            // Source name
             Text {
-                text: root.isMainDevice ? Audio.friendlyDeviceName(root.node) : Audio.appNodeDisplayName(root.node)
-                font.family: Config.theme.font
+                text: root.isMainDevice
+                ? Audio.friendlyDeviceName(root.node)
+                : Audio.appNodeDisplayName(root.node)
+                font.family:    Config.theme.font
                 font.pixelSize: Styling.fontSize(-2)
                 color: Colors.overSurfaceVariant
             }
 
-            // Separator line
             Separator {
                 Layout.fillWidth: true
             }
 
-            // Protection indicator
             Text {
                 visible: Audio.protectionTriggered && root.isMainDevice
                 text: Icons.shieldCheck
-                font.family: Icons.font
+                font.family:    Icons.font
                 font.pixelSize: 12
                 color: Colors.warning
 
@@ -154,12 +166,11 @@ Item {
                 }
             }
 
-            // Percentage
             Text {
                 text: `${Math.round(root.volume * 100)}%`
-                font.family: Config.theme.font
-                font.pixelSize: Styling.fontSize(-2)
-                color: Colors.overSurfaceVariant
+                font.family:         Config.theme.font
+                font.pixelSize:      Styling.fontSize(-2)
+                color:               Colors.overSurfaceVariant
                 horizontalAlignment: Text.AlignRight
             }
         }
