@@ -1,7 +1,7 @@
 .pragma library
 
 var data = {
-    "enabled": false,
+    "enabled": true,
     "iconsEnabled": false,
     "iconSize": 40,
     "spacingVertical": 16,
@@ -23,7 +23,7 @@ var data = {
         { "x": 0, "y": 8, "w": 0, "h": 160, "fromBottom": true }
     ],
 
-    "clockEnabled": false,
+    "clockEnabled": true,
     "clockX": 0,
     "clockY": 0,
     "clockColor": "auto"

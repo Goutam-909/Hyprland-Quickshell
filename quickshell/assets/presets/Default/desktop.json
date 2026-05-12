@@ -1,6 +1,31 @@
 {
-    "enabled": false,
+    "cavaBarCount": 40,
+    "cavaEnabled": false,
+    "cavaGradientEnd": "#ffe53b",
+    "cavaGradientMid1": "#C850C0",
+    "cavaGradientMid2": "#FFCC70",
+    "cavaGradientStart": "#4158D0",
+    "cavaInstances": [
+        {
+            "fromBottom": true,
+            "h": 160,
+            "w": 0,
+            "x": 0,
+            "y": 8
+        }
+    ],
+    "cavaOpacity": 1,
+    "cavaRotation": 0,
+    "cavaShowShadow": true,
+    "cavaVisualizerIntensity": 1,
+    "cavaWallpaperColors": false,
+    "clockColor": "surface",
+    "clockEnabled": true,
+    "clockX": 706,
+    "clockY": 249,
+    "enabled": true,
     "iconSize": 40,
+    "iconsEnabled": false,
     "spacingVertical": 16,
     "textColor": "overBackground"
 }

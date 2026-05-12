@@ -1,20 +1,10 @@
 {
-    "enabled": false,
-    "iconsEnabled": false,
-    "iconSize": 40,
-    "spacingVertical": 16,
-    "textColor": "overBackground",
-    "cavaEnabled": false,
     "cavaBarCount": 40,
-    "cavaVisualizerIntensity": 1,
-    "cavaShowShadow": true,
-    "cavaWallpaperColors": false,
-    "cavaRotation": 0,
-    "cavaOpacity": 1,
-    "cavaGradientStart": "#4158D0",
+    "cavaEnabled": false,
+    "cavaGradientEnd": "#ffe53b",
     "cavaGradientMid1": "#C850C0",
     "cavaGradientMid2": "#FFCC70",
-    "cavaGradientEnd": "#ffe53b",
+    "cavaGradientStart": "#4158D0",
     "cavaInstances": [
         {
             "fromBottom": true,
@@ -24,8 +14,18 @@
             "y": 8
         }
     ],
-    "clockEnabled": false,
-    "clockX": 0,
-    "clockY": 0,
-    "clockColor": "auto"
+    "cavaOpacity": 1,
+    "cavaRotation": 0,
+    "cavaShowShadow": true,
+    "cavaVisualizerIntensity": 1,
+    "cavaWallpaperColors": false,
+    "clockColor": "surface",
+    "clockEnabled": true,
+    "clockX": 631,
+    "clockY": 310,
+    "enabled": true,
+    "iconSize": 40,
+    "iconsEnabled": false,
+    "spacingVertical": 16,
+    "textColor": "overBackground"
 }

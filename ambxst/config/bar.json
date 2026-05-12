@@ -1,27 +1,28 @@
 {
-    "position": "top",
-    "launcherIcon": "/home/goutam/.config/quickshell/Ambxst/assets/ambxst/icons8-speed-60.png",
-    "launcherIconTint": true,
-    "launcherIconFullTint": true,
-    "launcherIconSize": 24,
-    "pillStyle": "default",
-    "screenList": [],
-    "enableFirefoxPlayer": true,
+    "availableOnFullscreen": false,
     "barColor": [
         [
             "surface",
             0
         ]
     ],
+    "containBar": false,
+    "enableFirefoxPlayer": true,
     "frameEnabled": false,
     "frameThickness": 6,
-    "pinnedOnStartup": true,
-    "hoverToReveal": true,
     "hoverRegionHeight": 8,
-    "showPinButton": true,
-    "availableOnFullscreen": false,
-    "use12hFormat": true,
-    "containBar": false,
+    "hoverToReveal": true,
+    "keepBarBorder": false,
     "keepBarShadow": false,
-    "keepBarBorder": false
+    "launcherIcon": "/home/goutam/.config/quickshell/Ambxst/assets/ambxst/rocket-launch.svg",
+    "launcherIconFullTint": true,
+    "launcherIconSize": 24,
+    "launcherIconTint": true,
+    "pillStyle": "default",
+    "pinnedOnStartup": true,
+    "position": "top",
+    "screenList": [
+    ],
+    "showPinButton": false,
+    "use12hFormat": true
 }
