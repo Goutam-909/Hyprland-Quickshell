@@ -218,22 +218,22 @@ kill_mpvpaper() {
 }
 
 kill_swww() {
-    if /usr/bin/pgrep -x swww-daemon &>/dev/null || /usr/bin/pgrep -x swww &>/dev/null; then
-        /usr/bin/pkill -9 swww-daemon 2>/dev/null || true
-        /usr/bin/pkill -9 swww         2>/dev/null || true
+    if /usr/bin/pgrep -x awww-daemon &>/dev/null || /usr/bin/pgrep -x awww &>/dev/null; then
+        /usr/bin/pkill -9 awww-daemon 2>/dev/null || true
+        /usr/bin/pkill -9 awww         2>/dev/null || true
         local a=0
-        while /usr/bin/pgrep -x swww-daemon &>/dev/null && [ "$a" -lt 5 ]; do
+        while /usr/bin/pgrep -x awww-daemon &>/dev/null && [ "$a" -lt 5 ]; do
             sleep 0.2; a=$((a+1))
         done
     fi
 }
 
 ensure_swww() {
-    if ! /usr/bin/pgrep -x swww-daemon &>/dev/null; then
-        setsid swww-daemon & disown; sleep 1
+    if ! /usr/bin/pgrep -x awww-daemon &>/dev/null; then
+        setsid awww-daemon & disown; sleep 1
     fi
     local a=0
-    while ! swww query &>/dev/null && [ "$a" -lt 5 ]; do
+    while ! awww query &>/dev/null && [ "$a" -lt 5 ]; do
         sleep 0.3; a=$((a+1))
     done
 }
@@ -248,8 +248,8 @@ cmd_set_image() {
     kill_mpvpaper
     ensure_swww
 
-    if swww query &>/dev/null; then
-        swww img "$img" \
+    if awww query &>/dev/null; then
+        awww img "$img" \
             --transition-fps 60 \
             --transition-type any \
             --transition-duration 3 \

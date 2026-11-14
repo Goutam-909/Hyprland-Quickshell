@@ -1,31 +1,33 @@
 {
-    "cavaBarCount": 40,
-    "cavaEnabled": false,
-    "cavaGradientEnd": "#ffe53b",
-    "cavaGradientMid1": "#C850C0",
-    "cavaGradientMid2": "#FFCC70",
-    "cavaGradientStart": "#4158D0",
-    "cavaInstances": [
-        {
-            "fromBottom": true,
-            "h": 160,
-            "w": 0,
-            "x": 0,
-            "y": 8
-        }
-    ],
-    "cavaOpacity": 1,
-    "cavaRotation": 0,
-    "cavaShowShadow": true,
-    "cavaVisualizerIntensity": 1,
-    "cavaWallpaperColors": false,
-    "clockColor": "surface",
-    "clockEnabled": true,
-    "clockX": 631,
-    "clockY": 310,
-    "enabled": true,
-    "iconSize": 40,
-    "iconsEnabled": false,
-    "spacingVertical": 16,
-    "textColor": "overBackground"
+  "enabled": true,
+  "iconsEnabled": false,
+  "iconSize": 40,
+  "spacingVertical": 16,
+  "textColor": "overBackground",
+  "cavaEnabled": false,
+  "cavaBarCount": 40,
+  "cavaVisualizerIntensity": 1,
+  "cavaShowShadow": true,
+  "cavaWallpaperColors": true,
+  "cavaRotation": 0,
+  "cavaOpacity": 1,
+  "cavaGradientStart": "#4158D0",
+  "cavaGradientMid1": "#C850C0",
+  "cavaGradientMid2": "#FFCC70",
+  "cavaGradientEnd": "#ffe53b",
+  "cavaInstances": [
+    {
+      "fromBottom": false,
+      "h": 160,
+      "w": 0,
+      "x": -11,
+      "y": 925
+    }
+  ],
+  "clockEnabled": true,
+  "clockX": 538,
+  "clockY": 562,
+  "clockColor": "auto",
+  "clockStyle": "digital",
+  "clockAutoColor": "auto"
 }

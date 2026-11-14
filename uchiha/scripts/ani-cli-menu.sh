@@ -1,3 +1,16 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-ani-cli --rofi -q Mp4 --dub
+choice=$(printf "Sub\nDub" | rofi -dmenu -p "ani-cli" -mesg "Choose audio track:")
+
+case "$choice" in
+    Dub)
+        ani-cli --rofi --dub
+        ;;
+    Sub)
+        ani-cli --rofi
+        ;;
+    *)
+        # User closed rofi / pressed Escape
+        exit 0
+        ;;
+esac

@@ -1,11 +1,17 @@
 -- MONITOR CONFIG
-hl.monitor({
-    output = "",
-    mode = "preferred",
-    position = "auto",
-    scale = "1"
-})
+--hl.monitor({
+--    output = "eDP-1",
+--    mode = "1920x1080@144",
+--    position = "0x0",
+--    scale = "1"
+--})
 
+--hl.monitor({
+--    output = "HDMI-A-1",
+--    mode = "preferred",
+--    position = "-1920x0",    -- to the left of eDP
+--    scale = 1
+--})
 hl.gesture({
     fingers = 4,
     direction = "swipe",
@@ -25,14 +31,14 @@ hl.gesture({
     fingers = 3,
     direction = "up",
     action = function()
-        hl.dispatch(hl.dsp.global("quickshell:overviewWorkspacesToggle"))
+    hl.dispatch(hl.dsp.global("quickshell:overviewWorkspacesToggle"))
     end
 })
 hl.gesture({
     fingers = 3,
     direction = "down",
     action = function()
-        hl.dispatch(hl.dsp.global("quickshell:overviewWorkspacesToggle"))
+    hl.dispatch(hl.dsp.global("quickshell:overviewWorkspacesToggle"))
     end
 })
 
@@ -47,15 +53,15 @@ hl.config({
     },
     general = {
         -- Gaps and border
-        gaps_in = 4,
-        gaps_out = 5,
+        gaps_in = 1,
+        gaps_out = 1,
         gaps_workspaces = 50,
 
         border_size = 1,
 
         col = {
             active_border = "rgba(0DB7D455)",
-            inactive_border = "rgba(31313600)"
+          inactive_border = "rgba(31313600)"
         },
         resize_on_border = true,
 
@@ -76,7 +82,7 @@ hl.config({
 
         blur = {
             enabled = true,
-            xray = true,
+            xray = false,
             special = false,
             new_optimizations = true,
             size = 10,
@@ -95,12 +101,13 @@ hl.config({
             enabled = true,
             range = 20,
             offset = {0, 2},
-            render_power = 10,
-            color = "rgba(00000020)"
+            render_power = 3,--10
+            -- color = "rgba(00000020)"
+            color        = "rgba(00000099)"
 
         },
         -- Dim
-        dim_inactive = true,
+        dim_inactive = false,
         dim_strength = 0.05,
         dim_special = 0.2
     },
@@ -280,11 +287,11 @@ hl.config({
         animate_mouse_windowdragging = false,
         enable_swallow = false,
         swallow_regex = "(foot|kitty|allacritty|Alacritty)",
-        on_focus_under_fullscreen = 2,
-        allow_session_lock_restore = true,
-        session_lock_xray = true,
-        initial_workspace_tracking = false,
-        focus_on_activate = true
+          on_focus_under_fullscreen = 2,
+          allow_session_lock_restore = true,
+          session_lock_xray = true,
+          initial_workspace_tracking = false,
+          focus_on_activate = true
     },
 
     binds = {

@@ -11,7 +11,8 @@ require("hyprland/general")
 require("hyprland/float")
 require("hyprland/colors")
 require("hyprland/keybinds")
-
+require("hyprland/windowrules")
+require("hyprland/rules")
 -- Custom --
 require("custom/execs")
 require("custom/general")
@@ -20,7 +21,10 @@ require("custom/keybinds")
 
 -- nwg-displays support: re-add the files if it updates later
 -- require("workspaces")
--- require("monitors")
+require("monitors")
 
 -- Shell overrides --
---require("hyprland/shellOverrides/main")
+require("hyprland/shellOverrides/main")
+require("hyprland/shellOverrides/animations")
+--require("macshell")
+require("ambxst")

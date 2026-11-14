@@ -1,0 +1,114 @@
+{
+  "2026-08-09": {
+    "totalMinutes": 180,
+    "totalFormatted": "3h 0m",
+    "sessions": 3,
+    "blocks": [
+      {
+        "label": "Class-QM",
+        "start": "10:30 AM",
+        "end": "11:45 AM",
+        "minutes": 75,
+        "status": "completed"
+      },
+      {
+        "label": "Class-CM",
+        "start": "12:00 PM",
+        "end": "1:00 PM",
+        "minutes": 60,
+        "status": "completed"
+      },
+      {
+        "label": "Class-CM",
+        "start": "1:15 PM",
+        "end": "2:00 PM",
+        "minutes": 45,
+        "status": "completed"
+      }
+    ]
+  },
+  "2026-08-10": {
+    "totalMinutes": 195,
+    "totalFormatted": "3h 15m",
+    "sessions": 2,
+    "blocks": [
+      {
+        "label": "Class-CM",
+        "start": "9:15 AM",
+        "end": "10:45 AM",
+        "minutes": 90,
+        "status": "completed"
+      },
+      {
+        "label": "Class-QM",
+        "start": "11:00 AM",
+        "end": "12:45 PM",
+        "minutes": 105,
+        "status": "completed"
+      }
+    ]
+  },
+  "2026-08-12": {
+    "totalMinutes": 308,
+    "totalFormatted": "5h 8m",
+    "sessions": 5,
+    "blocks": [
+      {
+        "label": "test",
+        "start": "12:50 AM",
+        "end": "1:00 AM",
+        "minutes": 10,
+        "status": "completed"
+      },
+      {
+        "label": "Revision",
+        "start": "9:30 AM",
+        "end": "11:00 AM",
+        "minutes": 90,
+        "status": "completed"
+      },
+      {
+        "label": "Class-QM",
+        "start": "11:00 AM",
+        "end": "12:20 PM",
+        "minutes": 80,
+        "status": "completed"
+      },
+      {
+        "label": "Class-QM",
+        "start": "12:20 PM",
+        "end": "1:03 PM",
+        "minutes": 43,
+        "status": "completed"
+      },
+      {
+        "label": "Study",
+        "start": "4:05 PM",
+        "end": "5:30 PM",
+        "minutes": 85,
+        "status": "completed"
+      }
+    ]
+  },
+  "2026-08-14": {
+    "totalMinutes": 170,
+    "totalFormatted": "2h 50m",
+    "sessions": 2,
+    "blocks": [
+      {
+        "label": "Class-QM",
+        "start": "9:30 AM",
+        "end": "11:20 AM",
+        "minutes": 110,
+        "status": "completed"
+      },
+      {
+        "label": "Class-QM",
+        "start": "11:30 AM",
+        "end": "12:30 PM",
+        "minutes": 60,
+        "status": "completed"
+      }
+    ]
+  }
+}

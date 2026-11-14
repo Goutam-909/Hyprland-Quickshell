@@ -1,10 +1,10 @@
 -- ######## Window rules ########
 
 -- Disable blur for xwayland context menus
-hl.window_rule({match = {class = "^()$", title = "^()$" },                   no_blur = true })
+--hl.window_rule({match = {class = "^()$", title = "^()$" },                   no_blur = true })
 
 -- Disable blur for every window
-hl.window_rule({match = {class = ".*" }, no_blur = true })
+--hl.window_rule({match = {class = ".*" }, no_blur = false })
 
 -- Floating
 hl.window_rule({match = {title = "^(Open File)(.*)$" },                      center = true})
@@ -87,7 +87,7 @@ hl.window_rule({match = {float = 0 }, no_shadow = true})
 hl.workspace_rule({ workspace = "special:special", gaps_out = 30 })
 
 -- ######## Layer rules ########
-hl.layer_rule({ match = { namespace = ".*" }, xray = true})
+hl.layer_rule({ match = { namespace = ".*" }, xray = false})
 hl.layer_rule({ match = { namespace = "walker" }, no_anim = true})
 hl.layer_rule({ match = { namespace = "selection" }, no_anim = true})
 hl.layer_rule({ match = { namespace = "overview" }, no_anim = true})
@@ -134,7 +134,7 @@ hl.layer_rule({ match = { namespace = "osk[0-9]*" }, ignore_alpha = 0.6})
 -- Quickshell: illogical-impulse
 hl.layer_rule({ match = { namespace = "quickshell:.*" }, blur_popups = true})
 hl.layer_rule({ match = { namespace = "quickshell:.*" }, blur = true})
-hl.layer_rule({ match = { namespace = "quickshell:.*" }, ignore_alpha = 0.79})
+hl.layer_rule({ match = { namespace = "quickshell:.*" }, ignore_alpha = 0.1})
 hl.layer_rule({ match = { namespace = "quickshell:bar" }, animation = "slide"})
 hl.layer_rule({ match = { namespace = "quickshell:actionCenter" }, no_anim = true})
 hl.layer_rule({ match = { namespace = "quickshell:cheatsheet" }, animation = "slide bottom"})
@@ -170,3 +170,24 @@ hl.layer_rule({ match = { namespace = "quickshell:wTaskView" }, no_anim = true})
 
 -- Launchers need to be FAST
 hl.layer_rule({ match = { namespace = "gtk4-layer-shell" }, no_anim = true})
+-- Real namespace fix: shell runs under "ambxst", not "quickshell"
+hl.layer_rule({ match = { namespace = "^(ambxst)$" }, blur = true })
+hl.layer_rule({ match = { namespace = "^(ambxst)$" }, blur_popups = true })
+hl.layer_rule({ match = { namespace = "^(ambxst)$" }, ignore_alpha = 0.5 })
+
+hl.window_rule({ match = { class = "^(kitty)$" }, fullscreen_state = "0 0" })
+hl.window_rule({ match = { class = "^(kitty-float)$" }, fullscreen_state = "0 0" })
+
+hl.layer_rule({ match = { namespace = "org.gnome.Nautilus" }, blur = true})
+hl.layer_rule({ match = { namespace = "org.gnome.Nautilus" }, ignore_alpha = 0.6})
+
+-- ######## MacShell layer rules ########
+hl.layer_rule({ match = { namespace = "macdock" },    blur = true, ignore_alpha = 0.2,  no_anim = true })
+hl.layer_rule({ match = { namespace = "macbarbg" },   blur = true, ignore_alpha = 0.05, no_anim = true })  -- the menu bar's background
+hl.layer_rule({ match = { namespace = "macspot" },    blur = true, ignore_alpha = 0.05, no_anim = true })  -- Spotlight
+hl.layer_rule({ match = { namespace = "macwall" },    blur = true, ignore_alpha = 0.05 })                  -- wallpaper picker
+hl.layer_rule({ match = { namespace = "macosd" },     blur = true, ignore_alpha = 0.05, no_anim = true })  -- volume/brightness popup
+hl.layer_rule({ match = { namespace = "macswitch" },  blur = true, ignore_alpha = 0.05, no_anim = true })  -- Alt+Tab (only matters if the switcher is not "glass")
+hl.layer_rule({ match = { namespace = "macshot" },    no_anim = true })                                    -- screenshot picker (optional)
+hl.layer_rule({ match = { namespace = "macbar" }, blur = true, ignore_alpha = 0.05 })
+

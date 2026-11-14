@@ -1,50 +1,50 @@
 /* Material You Colors */
-@define-color background #131318;
-@define-color background-alt #201f24;
-@define-color background-light #3a383e;
-@define-color background-dark #131318;
+@define-color background #111318;
+@define-color background-alt #1e2025;
+@define-color background-light #37393e;
+@define-color background-dark #111318;
 
-@define-color foreground #e5e1e9;
-@define-color foreground-alt #c8c4d3;
+@define-color foreground #e2e2e9;
+@define-color foreground-alt #c4c6d0;
 
-@define-color primary #c5c0ff;
-@define-color primary-container #4e4799;
-@define-color on-primary #2c2375;
-@define-color on-primary-container #f6f1ff;
+@define-color primary #acc7ff;
+@define-color primary-container #2a4678;
+@define-color on-primary #0f2f60;
+@define-color on-primary-container #d7e2ff;
 
-@define-color secondary #c7c2ea;
-@define-color secondary-container #464364;
-@define-color on-secondary #2f2d4c;
-@define-color on-secondary-container #e1dcff;
+@define-color secondary #bec6dc;
+@define-color secondary-container #3f4759;
+@define-color on-secondary #283041;
+@define-color on-secondary-container #dae2f9;
 
-@define-color tertiary #fface9;
-@define-color tertiary-container #7f3771;
-@define-color on-tertiary #57134d;
-@define-color on-tertiary-container #fff0f7;
+@define-color tertiary #debcdf;
+@define-color tertiary-container #583e5b;
+@define-color on-tertiary #402844;
+@define-color on-tertiary-container #fbd7fc;
 
 @define-color error #ffb4ab;
 @define-color error-container #93000a;
 @define-color on-error #690005;
 @define-color on-error-container #ffdad6;
 
-@define-color surface-variant #474551;
-@define-color outline #928f9c;
-@define-color outline-variant #474551;
+@define-color surface-variant #44474f;
+@define-color outline #8e9099;
+@define-color outline-variant #44474f;
 
 /* Pywal-style 16 color palette */
-@define-color color0 #131318;
+@define-color color0 #111318;
 @define-color color1 #ffb4ab;
-@define-color color2 #fface9;
-@define-color color3 #c7c2ea;
-@define-color color4 #c5c0ff;
-@define-color color5 #4e4799;
-@define-color color6 #464364;
-@define-color color7 #e5e1e9;
-@define-color color8 #474551;
+@define-color color2 #debcdf;
+@define-color color3 #bec6dc;
+@define-color color4 #acc7ff;
+@define-color color5 #2a4678;
+@define-color color6 #3f4759;
+@define-color color7 #e2e2e9;
+@define-color color8 #44474f;
 @define-color color9 #93000a;
-@define-color color10 #7f3771;
-@define-color color11 #c7c2ea;
-@define-color color12 #c5c0ff;
-@define-color color13 #f6f1ff;
-@define-color color14 #e1dcff;
-@define-color color15 #c8c4d3;
+@define-color color10 #583e5b;
+@define-color color11 #bec6dc;
+@define-color color12 #acc7ff;
+@define-color color13 #d7e2ff;
+@define-color color14 #dae2f9;
+@define-color color15 #c4c6d0;

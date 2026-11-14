@@ -1,0 +1,69 @@
+{
+  "bar": {
+    "barVisible": true,
+    "barMode": 2,
+    "widgetStyle": 0,
+    "showDateTime": true,
+    "showMediaplayer": true,
+    "showWorkspaces": true,
+    "showSystemTray": true,
+    "showBattery": true,
+    "showPfp": true,
+    "wsShown": 8,
+    "wsDynamic": false,
+    "wsShowNumbers": false,
+    "wsAlwaysShowNumbers": false,
+    "wsShowAppIcons": true
+  },
+  "mclock": {
+    "clockStyle": "background",
+    "clockPosMode": "manual",
+    "clockPosX": 0.1,
+    "clockPosY": 0.4,
+    "bgClockColor": "",
+    "bgClockM3Color": "",
+    "digitalClockColor": "",
+    "digitalClockM3Color": ""
+  },
+  "appearance": {
+    "activeTheme": "default",
+    "themeMode": "dark",
+    "matugenScheme": "scheme-content",
+    "backgroundTransparency": 0.5,
+    "contentTransparency": 0.4
+  },
+  "appearanceExtra": {
+    "activeTheme": "default",
+    "backgroundTransparency": 0,
+    "contentTransparency": 0
+  },
+  "clock": {
+    "clockStyle": "background",
+    "clockPosMode": "manual",
+    "clockPosX": 0.1,
+    "clockPosY": 0.4,
+    "bgClockColor": "",
+    "bgClockM3Color": "onPrimary",
+    "digitalClockColor": "",
+    "digitalClockM3Color": ""
+  },
+  "mdock": {
+    "enabled": true,
+    "height": 70,
+    "hoverRegionHeight": 2,
+    "hoverToReveal": true,
+    "pinnedApps": [
+      "protonvpn-app",
+      "kitty",
+      "kdesystemsettings",
+      "com.github.xournalpp.xournalpp",
+      "spotify",
+      "org.kde.dolphin",
+      "brave-origin",
+      "firefox",
+      "zen"
+    ],
+    "ignoredAppRegexes": [],
+    "mode": "default"
+  }
+}

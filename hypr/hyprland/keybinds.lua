@@ -9,7 +9,7 @@
 local term     = "kitty"
 local editor   = "code"
 local file     = "dolphin"
-local browser  = "firefox"
+local browser  = "google-chrome-stable"
 local hyprScripts = "$HOME/.config/hypr/hyprland/scripts"
 
 
@@ -30,7 +30,8 @@ hl.bind("SUPER + T",          hl.dsp.exec_cmd(term),                          { 
 hl.bind("SUPER + E",          hl.dsp.exec_cmd(file),                          { description = "File manager" })
 hl.bind("SUPER + F",          hl.dsp.exec_cmd(browser),                       { description = "Browser" })
 hl.bind("SUPER + Return",     hl.dsp.exec_cmd("kitty --class kitty-float"),   { description = "Floating kitty" })
-hl.bind("SUPER + R",          hl.dsp.exec_cmd('sh -c "rmpc rescan && kitty --class rmpc-term -e rmpc"'), { description = "rmpc (music client)" })
+hl.bind("SUPER + R", hl.dsp.exec_cmd("bash -c 'pgrep -x rofi && pkill rofi || /home/goutam/.config/uchiha/scripts/ani-cli-menu.sh'"))
+--hl.bind("SUPER + R",          hl.dsp.exec_cmd('sh -c "rmpc rescan && kitty --class rmpc-term -e rmpc"'), { description = "rmpc (music client)" })
 hl.bind("CTRL + SHIFT + Escape", hl.dsp.exec_cmd("kitty -1 btop"),            { description = "System monitor (btop)" })
 
 -- Restart widgets
@@ -44,19 +45,6 @@ hl.bind("SUPER + SHIFT + R",
         { locked = true, description = "Record screen (with sound)" })
 
 
--- ── ambxst launcher bindings ──────────────────────────────────────────────────
-hl.bind("SUPER + A",         hl.dsp.exec_cmd("ambxst run launcher"),    { description = "App launcher" })
-hl.bind("SUPER + D",         hl.dsp.exec_cmd("ambxst run dashboard"),   { description = "Dashboard" })
-hl.bind("SUPER + V",         hl.dsp.exec_cmd("ambxst run assistant"),   { description = "Assistant" })
-hl.bind("SUPER + C",         hl.dsp.exec_cmd("ambxst run clipboard"),   { description = "Clipboard" })
-hl.bind("SUPER + Period",    hl.dsp.exec_cmd("ambxst run emoji"),       { description = "Emoji picker" })
-hl.bind("SUPER + N",         hl.dsp.exec_cmd("ambxst run notes"),       { description = "Notes" })
-hl.bind("SUPER + Space",     hl.dsp.exec_cmd("ambxst run wallpapers"),  { description = "Wallpapers" })
-hl.bind("SUPER + Tab",       hl.dsp.exec_cmd("ambxst run overview"),    { description = "Overview" })
-hl.bind("SUPER + BackSpace", hl.dsp.exec_cmd("ambxst run powermenu"),   { description = "Power menu" })
-hl.bind("SUPER + S",         hl.dsp.exec_cmd("ambxst run tools"),       { description = "Tools" })
-hl.bind("SUPER + L",         hl.dsp.exec_cmd("loginctl lock-session"),  { description = "Lock session" })
-hl.bind("SUPER + M",         hl.dsp.exec_cmd("ambxst run mediawindow"), { description = "Music" })
 
 -- ── Touch deck / quick web shortcuts ─────────────────────────────────────────
 hl.bind("ALT + F1", hl.dsp.exec_cmd('xdg-open "https://unacademy.com"'))
@@ -71,20 +59,14 @@ hl.bind("XF86AudioPlay",  hl.dsp.exec_cmd("playerctl play-pause"), { locked = tr
 hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
 hl.bind("XF86AudioNext",  hl.dsp.exec_cmd("playerctl next"),       { locked = true })
 hl.bind("XF86AudioPrev",  hl.dsp.exec_cmd("playerctl previous"),   { locked = true })
-
+hl.bind("XF86Calculator", hl.dsp.exec_cmd("gnome-calculator"))
+hl.bind("XF86Launch2",    hl.dsp.exec_cmd("gnome-disks"))
 -- Fn key aliases for media
 hl.bind("F9",  hl.dsp.exec_cmd("playerctl play-pause"), { locked = true, description = "Play/pause" })
 hl.bind("F10", hl.dsp.exec_cmd("playerctl next"),       { locked = true, description = "Next track" })
 hl.bind("F8",  hl.dsp.exec_cmd("playerctl previous"),   { locked = true, description = "Previous track" })
 
 
--- ── Brightness ────────────────────────────────────────────────────────────────
-hl.bind("XF86MonBrightnessUp",
-        hl.dsp.exec_cmd("ambxst brightness +5"),
-        { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessDown",
-        hl.dsp.exec_cmd("ambxst brightness -5"),
-        { locked = true, repeating = true })
 
 
 -- ── Volume ────────────────────────────────────────────────────────────────────
@@ -104,9 +86,9 @@ hl.bind("XF86AudioMicMute",
 
 -- ── Screenshot / Screencapture ────────────────────────────────────────────────
 -- Region screenshot
-hl.bind("SUPER + Print",
-        hl.dsp.exec_cmd("hyprshot -m region"),
-        { description = "Screenshot region" })
+--hl.bind("SUPER + Print",
+--        hl.dsp.exec_cmd("hyprshot -m region"),
+--        { description = "Screenshot region" })
 
 -- Fullscreen screenshot → save to file
 hl.bind("Print",

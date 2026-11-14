@@ -1,23 +1,22 @@
 {
-    "availableOnFullscreen": false,
     "enabled": true,
-    "height": 60,
+    "theme": "floating",
+    "position": "bottom",
+    "height": 65,
+    "iconSize": 46,
+    "spacing": 4,
+    "margin": 4,
     "hoverRegionHeight": 16,
+    "pinnedOnStartup": false,
     "hoverToReveal": true,
-    "iconSize": 30,
+    "availableOnFullscreen": false,
+    "showRunningIndicators": true,
+    "showPinButton": false,
+    "showOverviewButton": false,
     "ignoredAppRegexes": [
         "quickshell.*",
         "xdg-desktop-portal.*"
     ],
-    "keepHidden": false,
-    "margin": 4,
-    "pinnedOnStartup": false,
-    "position": "bottom",
-    "screenList": [
-    ],
-    "showOverviewButton": true,
-    "showPinButton": true,
-    "showRunningIndicators": true,
-    "spacing": 4,
-    "theme": "default"
+    "screenList": [],
+    "keepHidden": false
 }

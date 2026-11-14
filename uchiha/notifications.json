@@ -1,0 +1,88 @@
+[
+  {
+    "id": 7,
+    "appName": "System Notifications",
+    "summary": "USB Device Detected",
+    "body": "Huasheng Electronics USB2.0 HUB has been connected.",
+    "appIcon": "drive-removable-media-usb",
+    "image": "",
+    "urgency": 0,
+    "timestamp": 1785435552815,
+    "actions": []
+  },
+  {
+    "id": 6,
+    "appName": "System Notifications",
+    "summary": "USB Device Removed",
+    "body": "Huasheng Electronics USB2.0 HUB has been disconnected.",
+    "appIcon": "drive-removable-media-usb",
+    "image": "",
+    "urgency": 0,
+    "timestamp": 1785435552477,
+    "actions": []
+  },
+  {
+    "id": 5,
+    "appName": "System Notifications",
+    "summary": "USB Device Detected",
+    "body": "Huasheng Electronics USB2.0 HUB has been connected.",
+    "appIcon": "drive-removable-media-usb",
+    "image": "",
+    "urgency": 0,
+    "timestamp": 1785434415676,
+    "actions": []
+  },
+  {
+    "id": 4,
+    "appName": "System Notifications",
+    "summary": "USB Device Removed",
+    "body": "Huasheng Electronics USB2.0 HUB has been disconnected.",
+    "appIcon": "drive-removable-media-usb",
+    "image": "",
+    "urgency": 0,
+    "timestamp": 1785434414367,
+    "actions": []
+  },
+  {
+    "id": 3,
+    "appName": "System Notifications",
+    "summary": "USB Device Detected",
+    "body": "Huasheng Electronics USB2.0 HUB has been connected.",
+    "appIcon": "drive-removable-media-usb",
+    "image": "",
+    "urgency": 0,
+    "timestamp": 1785434414241,
+    "actions": []
+  },
+  {
+    "id": 2,
+    "appName": "Screenshot",
+    "summary": "Screenshot Captured",
+    "body": "Fullscreen",
+    "appIcon": "",
+    "image": "image://icon//home/goutam/Pictures/Screenshots/Screenshot_2026-07-30_23.23.20.png",
+    "urgency": 1,
+    "timestamp": 1785434000783,
+    "actions": []
+  },
+  {
+    "id": 1,
+    "appName": "Cachy-Update",
+    "summary": "Cachy-Update",
+    "body": "15 updates available",
+    "appIcon": "cachy-update_updates-available-blue",
+    "image": "",
+    "urgency": 1,
+    "timestamp": 1785433583052,
+    "actions": [
+      {
+        "identifier": "run",
+        "text": "Run Cachy-Update"
+      },
+      {
+        "identifier": "close",
+        "text": "Close"
+      }
+    ]
+  }
+]

@@ -31,7 +31,7 @@
   },
   "bar": {
     "barVisible": true,
-    "barMode": 2,
+    "barMode": 0,
     "widgetStyle": 0,
     "showDateTime": true,
     "showMediaplayer": true,
@@ -50,26 +50,26 @@
     "themeMode": "dark",
     "matugenScheme": "scheme-content",
     "backgroundTransparency": 0,
-    "contentTransparency": 0
+    "contentTransparency": 0.4
   },
   "clock": {
     "clockStyle": "background",
-    "clockPosMode": "auto",
-    "clockPosX": 0.05,
-    "clockPosY": 0.3,
+    "clockPosMode": "manual",
+    "clockPosX": 0.65,
+    "clockPosY": 0.1,
     "bgClockColor": "",
-    "bgClockM3Color": "",
+    "bgClockM3Color": "onSurface",
     "digitalClockColor": "",
     "digitalClockM3Color": ""
   },
   "background": {
-    "wallpaperPath": "/home/goutam/Pictures/wallpapers/Wall-377.jpg",
+    "wallpaperPath": "/home/goutam/Pictures/wallpapers/Wall-15.jpg",
     "thumbnailPath": "",
     "sourceColors": [
-      "#2e6480",
-      "#dfc594",
-      "#97b5a8",
-      "#a59492"
+      "#f1edb3",
+      "#194e6b",
+      "#38725d",
+      "#9b5b59"
     ],
     "sourceColorIndex": 0
   }

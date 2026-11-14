@@ -1,0 +1,663 @@
+========================================
+FILE: ./overview.js
+========================================
+.pragma library
+
+var data = {
+    "rows": 2,
+    "columns": 5,
+    "scale": 0.15,
+    "workspaceSpacing": 8
+}
+
+
+
+========================================
+FILE: ./ai.js
+========================================
+var data = {
+    "systemPrompt": "You are a helpful assistant running on a Linux system. You have access to some tools to control the system.",
+    "tool": "none",
+    "extraModels": [],
+    "defaultModel": "gemini-pro"
+}
+
+
+
+========================================
+FILE: ./system.js
+========================================
+.pragma library
+
+var data = {
+    "disks": ["/"],
+    "updateServiceEnabled": true,
+    "idle": {
+        "general": {
+            "lock_cmd": "ambxst lock",
+            "before_sleep_cmd": "loginctl lock-session",
+            "after_sleep_cmd": "ambxst screen on"
+        },
+        "listeners": [
+            {
+                "timeout": 150,
+                "onTimeout": "ambxst brightness 10 -s",
+                "onResume": "ambxst brightness -r"
+            },
+            {
+                "timeout": 300,
+                "onTimeout": "loginctl lock-session"
+            },
+            {
+                "timeout": 330,
+                "onTimeout": "ambxst screen off",
+                "onResume": "ambxst screen on"
+            },
+            {
+                "timeout": 1800,
+                "onTimeout": "ambxst suspend"
+            }
+        ]
+    },
+    "ocr": {
+        "eng": true,
+        "spa": true,
+        "lat": false,
+        "jpn": false,
+        "chi_sim": false,
+        "chi_tra": false,
+        "kor": false
+    },
+    "pomodoro": {
+        "workTime": 1500,
+        "restTime": 300,
+        "autoStart": false,
+        "syncSpotify": false
+    }
+}
+
+
+
+========================================
+FILE: ./lockscreen.js
+========================================
+.pragma library
+
+var data = {
+    "position": "bottom"
+}
+
+
+
+========================================
+FILE: ./weather.js
+========================================
+.pragma library
+
+var data = {
+    "location": "Kolkata",
+    "unit": "C"
+}
+
+
+
+========================================
+FILE: ./notch.js
+========================================
+.pragma library
+
+var data = {
+    "theme": "default",
+    "position": "top",
+    "hoverRegionHeight": 8,
+    "keepHidden": false,
+    "noMediaDisplay": "userHost",
+    "customText": "Ambxst",
+    "disableHoverExpansion": true
+}
+
+
+
+========================================
+FILE: ./desktop.js
+========================================
+.pragma library
+
+var data = {
+    "enabled": true,
+    "iconsEnabled": false,
+    "iconSize": 40,
+    "spacingVertical": 16,
+    "textColor": "overBackground",
+
+    "cavaEnabled": false,
+    "cavaBarCount": 40,
+    "cavaVisualizerIntensity": 1.0,
+    "cavaShowShadow": true,
+    "cavaWallpaperColors": false,
+    "cavaRotation": 0,
+    "cavaOpacity": 1.0,
+    "cavaGradientStart": "#4158D0",
+    "cavaGradientMid1": "#C850C0",
+    "cavaGradientMid2": "#FFCC70",
+    "cavaGradientEnd": "#ffe53b",
+
+    "cavaInstances": [
+        { "x": 0, "y": 8, "w": 0, "h": 160, "fromBottom": true }
+    ],
+
+    "clockEnabled": true,
+    "clockX": 0,
+    "clockY": 0,
+    "clockColor": "auto"
+}
+
+
+
+========================================
+FILE: ./bar.js
+========================================
+.pragma library
+
+var data = {
+    "position": "top",
+    "launcherIcon": "",
+    "launcherIconTint": true,
+    "launcherIconFullTint": true,
+    "launcherIconSize": 24,
+    "pillStyle": "default",
+    "screenList": [],
+    "enableFirefoxPlayer": true,
+    "barColor": [["surface", 0.0]],
+    "frameEnabled": false,
+    "frameThickness": 6,
+    "pinnedOnStartup": true,
+    "hoverToReveal": true,
+    "hoverRegionHeight": 8,
+    "showPinButton": true,
+    "availableOnFullscreen": false,
+    "use12hFormat": true,
+    "containBar": false,
+    "keepBarShadow": false,
+    "keepBarBorder": false
+}
+
+
+
+========================================
+FILE: ./workspaces.js
+========================================
+.pragma library
+
+var data = {
+    "shown": 10,
+    "showAppIcons": true,
+    "alwaysShowNumbers": false,
+    "showNumbers": false,
+    "dynamic": false,
+    "style": "classic"
+}
+
+
+
+========================================
+FILE: ./dock.js
+========================================
+.pragma library
+
+var data = {
+    "enabled": true,
+    "theme": "default",
+    "position": "bottom",
+    "height": 60,
+    "iconSize": 30,
+    "spacing": 4,
+    "margin": 4,
+    "hoverRegionHeight": 16,
+    "pinnedOnStartup": false,
+    "hoverToReveal": true,
+    "availableOnFullscreen": false,
+    "showRunningIndicators": true,
+    "showPinButton": true,
+    "showOverviewButton": true,
+    "ignoredAppRegexes": [
+        "quickshell.*",
+        "xdg-desktop-portal.*"
+    ],
+    "screenList": [],
+    "keepHidden": false
+}
+
+
+
+========================================
+FILE: ./hyprland.js
+========================================
+.pragma library
+
+var data = {
+    "activeBorderColor": ["primary"],
+    "borderAngle": 45,
+    "inactiveBorderColor": ["surface"],
+    "inactiveBorderAngle": 45,
+    "borderSize": 2,
+    "rounding": 16,
+    "syncRoundness": true,
+    "syncBorderWidth": false,
+    "syncBorderColor": true,
+    "syncShadowOpacity": false,
+    "syncShadowColor": false,
+    "gapsIn": 4,
+    "gapsOut": 5,
+    "layout": "dwindle",
+    "shadowEnabled": true,
+    "shadowRange": 50,
+    "shadowRenderPower": 10,
+    "shadowSharp": false,
+    "shadowIgnoreWindow": true,
+    "shadowColor": "shadow",
+    "shadowColorInactive": "shadow",
+    "shadowOpacity": 0.5,
+    "shadowOffset": "0 4",
+    "shadowScale": 1.0,
+    "blurEnabled": true,
+    "blurSize": 4,
+    "blurPasses": 4,
+    "blurIgnoreOpacity": true,
+    "blurExplicitIgnoreAlpha": false,
+    "blurIgnoreAlphaValue": 0.2,
+    "blurNewOptimizations": true,
+    "blurXray": false,
+    "blurNoise": 0.0,
+    "blurContrast": 1.0,
+    "blurBrightness": 1.0,
+    "blurVibrancy": 0.0,
+    "blurVibrancyDarkness": 0.0,
+    "blurSpecial": true,
+    "blurPopups": true,
+    "blurPopupsIgnorealpha": 0.58,
+    "blurInputMethods": false,
+    "blurInputMethodsIgnorealpha": 0.8
+}
+
+
+
+========================================
+FILE: ./performance.js
+========================================
+.pragma library
+
+var data = {
+    "blurTransition": true,
+    "windowPreview": true,
+    "wavyLine": true,
+    "rotateCoverArt": true,
+    "dashboardPersistTabs": false,
+    "dashboardMaxPersistentTabs": 2
+}
+
+
+
+========================================
+FILE: ./theme.js
+========================================
+.pragma library
+
+var data = {
+    "oledMode": false,
+    "lightMode": false,
+    "roundness": 16,
+    "font": "Roboto Condensed",
+    "fontSize": 14,
+    "monoFont": "Iosevka Nerd Font Mono",
+    "monoFontSize": 14,
+    "tintIcons": false,
+    "enableCorners": true,
+    "animDuration": 300,
+    "shadowOpacity": 0.5,
+    "shadowColor": "shadow",
+    "shadowXOffset": 0,
+    "shadowYOffset": 0,
+    "shadowBlur": 1,
+    "srBg": {
+        "label": "Background",
+        "gradient": [["background", 0.0]],
+        "gradientType": "linear",
+        "gradientAngle": 0,
+        "gradientCenterX": 0.5,
+        "gradientCenterY": 0.5,
+        "halftoneDotMin": 0.0,
+        "halftoneDotMax": 2.0,
+        "halftoneStart": 0.0,
+        "halftoneEnd": 1.0,
+        "halftoneDotColor": "surface",
+        "halftoneBackgroundColor": "background",
+        "border": ["surfaceBright", 0],
+        "itemColor": "overBackground",
+        "opacity": 1.0
+    },
+    "srPopup": {
+        "label": "Popup",
+        "gradient": [["background", 0.0]],
+        "gradientType": "linear",
+        "gradientAngle": 0,
+        "gradientCenterX": 0.5,
+        "gradientCenterY": 0.5,
+        "halftoneDotMin": 0.0,
+        "halftoneDotMax": 2.0,
+        "halftoneStart": 0.0,
+        "halftoneEnd": 1.0,
+        "halftoneDotColor": "surface",
+        "halftoneBackgroundColor": "background",
+        "border": ["surfaceBright", 2],
+        "itemColor": "overBackground",
+        "opacity": 1.0
+    },
+    "srInternalBg": {
+        "label": "Internal BG",
+        "gradient": [["background", 0.0]],
+        "gradientType": "linear",
+        "gradientAngle": 0,
+        "gradientCenterX": 0.5,
+        "gradientCenterY": 0.5,
+        "halftoneDotMin": 0.0,
+        "halftoneDotMax": 2.0,
+        "halftoneStart": 0.0,
+        "halftoneEnd": 1.0,
+        "halftoneDotColor": "surface",
+        "halftoneBackgroundColor": "background",
+        "border": ["surfaceBright", 0],
+        "itemColor": "overBackground",
+        "opacity": 1.0
+    },
+    "srBarBg": {
+        "label": "Bar BG",
+        "gradient": [["surfaceDim", 0.0]],
+        "gradientType": "linear",
+        "gradientAngle": 0,
+        "gradientCenterX": 0.5,
+        "gradientCenterY": 0.5,
+        "halftoneDotMin": 0.0,
+        "halftoneDotMax": 2.0,
+        "halftoneStart": 0.0,
+        "halftoneEnd": 1.0,
+        "halftoneDotColor": "surface",
+        "halftoneBackgroundColor": "surfaceDim",
+        "border": ["surfaceBright", 0],
+        "itemColor": "overBackground",
+        "opacity": 0.0
+    },
+    "srPane": {
+        "label": "Pane",
+        "gradient": [["surface", 0.0]],
+        "gradientType": "linear",
+        "gradientAngle": 0,
+        "gradientCenterX": 0.5,
+        "gradientCenterY": 0.5,
+        "halftoneDotMin": 0.0,
+        "halftoneDotMax": 2.0,
+        "halftoneStart": 0.0,
+        "halftoneEnd": 1.0,
+        "halftoneDotColor": "surfaceBright",
+        "halftoneBackgroundColor": "surface",
+        "border": ["surfaceBright", 0],
+        "itemColor": "overBackground",
+        "opacity": 1.0
+    },
+    "srCommon": {
+        "label": "Common",
+        "gradient": [["surface", 0.0]],
+        "gradientType": "linear",
+        "gradientAngle": 0,
+        "gradientCenterX": 0.5,
+        "gradientCenterY": 0.5,
+        "halftoneDotMin": 0.0,
+        "halftoneDotMax": 2.0,
+        "halftoneStart": 0.0,
+        "halftoneEnd": 1.0,
+        "halftoneDotColor": "background",
+        "halftoneBackgroundColor": "surface",
+        "border": ["surfaceBright", 0],
+        "itemColor": "overBackground",
+        "opacity": 1.0
+    },
+    "srFocus": {
+        "label": "Focus",
+        "gradient": [["surfaceBright", 0.0]],
+        "gradientType": "linear",
+        "gradientAngle": 0,
+        "gradientCenterX": 0.5,
+        "gradientCenterY": 0.5,
+        "halftoneDotMin": 0.0,
+        "halftoneDotMax": 2.0,
+        "halftoneStart": 0.0,
+        "halftoneEnd": 1.0,
+        "halftoneDotColor": "surfaceVariant",
+        "halftoneBackgroundColor": "surfaceBright",
+        "border": ["surfaceBright", 0],
+        "itemColor": "overBackground",
+        "opacity": 1.0
+    },
+    "srPrimary": {
+        "label": "Primary",
+        "gradient": [["primary", 0.0]],
+        "gradientType": "linear",
+        "gradientAngle": 0,
+        "gradientCenterX": 0.5,
+        "gradientCenterY": 0.5,
+        "halftoneDotMin": 0.0,
+        "halftoneDotMax": 2.0,
+        "halftoneStart": 0.0,
+        "halftoneEnd": 1.0,
+        "halftoneDotColor": "overPrimaryContainer",
+        "halftoneBackgroundColor": "primary",
+        "border": ["primary", 0],
+        "itemColor": "overPrimary",
+        "opacity": 1.0
+    },
+    "srPrimaryFocus": {
+        "label": "Primary Focus",
+        "gradient": [["overPrimaryContainer", 0.0]],
+        "gradientType": "linear",
+        "gradientAngle": 0,
+        "gradientCenterX": 0.5,
+        "gradientCenterY": 0.5,
+        "halftoneDotMin": 0.0,
+        "halftoneDotMax": 2.0,
+        "halftoneStart": 0.0,
+        "halftoneEnd": 1.0,
+        "halftoneDotColor": "primary",
+        "halftoneBackgroundColor": "overPrimaryContainer",
+        "border": ["overBackground", 0],
+        "itemColor": "overPrimary",
+        "opacity": 1.0
+    },
+    "srOverPrimary": {
+        "label": "Over Primary",
+        "gradient": [["overPrimary", 0.0]],
+        "gradientType": "linear",
+        "gradientAngle": 0,
+        "gradientCenterX": 0.5,
+        "gradientCenterY": 0.5,
+        "halftoneDotMin": 0.0,
+        "halftoneDotMax": 2.0,
+        "halftoneStart": 0.0,
+        "halftoneEnd": 1.0,
+        "halftoneDotColor": "primaryContainer",
+        "halftoneBackgroundColor": "overPrimary",
+        "border": ["overPrimary", 0],
+        "itemColor": "primary",
+        "opacity": 1.0
+    },
+    "srSecondary": {
+        "label": "Secondary",
+        "gradient": [["secondary", 0.0]],
+        "gradientType": "linear",
+        "gradientAngle": 0,
+        "gradientCenterX": 0.5,
+        "gradientCenterY": 0.5,
+        "halftoneDotMin": 0.0,
+        "halftoneDotMax": 2.0,
+        "halftoneStart": 0.0,
+        "halftoneEnd": 1.0,
+        "halftoneDotColor": "overSecondaryContainer",
+        "halftoneBackgroundColor": "secondary",
+        "border": ["secondary", 0],
+        "itemColor": "overSecondary",
+        "opacity": 1.0
+    },
+    "srSecondaryFocus": {
+        "label": "Secondary Focus",
+        "gradient": [["overSecondaryContainer", 0.0]],
+        "gradientType": "linear",
+        "gradientAngle": 0,
+        "gradientCenterX": 0.5,
+        "gradientCenterY": 0.5,
+        "halftoneDotMin": 0.0,
+        "halftoneDotMax": 2.0,
+        "halftoneStart": 0.0,
+        "halftoneEnd": 1.0,
+        "halftoneDotColor": "secondary",
+        "halftoneBackgroundColor": "overSecondaryContainer",
+        "border": ["overBackground", 0],
+        "itemColor": "overSecondary",
+        "opacity": 1.0
+    },
+    "srOverSecondary": {
+        "label": "Over Secondary",
+        "gradient": [["overSecondary", 0.0]],
+        "gradientType": "linear",
+        "gradientAngle": 0,
+        "gradientCenterX": 0.5,
+        "gradientCenterY": 0.5,
+        "halftoneDotMin": 0.0,
+        "halftoneDotMax": 2.0,
+        "halftoneStart": 0.0,
+        "halftoneEnd": 1.0,
+        "halftoneDotColor": "secondaryContainer",
+        "halftoneBackgroundColor": "overSecondary",
+        "border": ["overSecondary", 0],
+        "itemColor": "secondary",
+        "opacity": 1.0
+    },
+    "srTertiary": {
+        "label": "Tertiary",
+        "gradient": [["tertiary", 0.0]],
+        "gradientType": "linear",
+        "gradientAngle": 0,
+        "gradientCenterX": 0.5,
+        "gradientCenterY": 0.5,
+        "halftoneDotMin": 0.0,
+        "halftoneDotMax": 2.0,
+        "halftoneStart": 0.0,
+        "halftoneEnd": 1.0,
+        "halftoneDotColor": "overTertiaryContainer",
+        "halftoneBackgroundColor": "tertiary",
+        "border": ["tertiary", 0],
+        "itemColor": "overTertiary",
+        "opacity": 1.0
+    },
+    "srTertiaryFocus": {
+        "label": "Tertiary Focus",
+        "gradient": [["overTertiaryContainer", 0.0]],
+        "gradientType": "linear",
+        "gradientAngle": 0,
+        "gradientCenterX": 0.5,
+        "gradientCenterY": 0.5,
+        "halftoneDotMin": 0.0,
+        "halftoneDotMax": 2.0,
+        "halftoneStart": 0.0,
+        "halftoneEnd": 1.0,
+        "halftoneDotColor": "tertiary",
+        "halftoneBackgroundColor": "overTertiaryContainer",
+        "border": ["overBackground", 0],
+        "itemColor": "overTertiary",
+        "opacity": 1.0
+    },
+    "srOverTertiary": {
+        "label": "Over Tertiary",
+        "gradient": [["overTertiary", 0.0]],
+        "gradientType": "linear",
+        "gradientAngle": 0,
+        "gradientCenterX": 0.5,
+        "gradientCenterY": 0.5,
+        "halftoneDotMin": 0.0,
+        "halftoneDotMax": 2.0,
+        "halftoneStart": 0.0,
+        "halftoneEnd": 1.0,
+        "halftoneDotColor": "tertiaryContainer",
+        "halftoneBackgroundColor": "overTertiary",
+        "border": ["overTertiary", 0],
+        "itemColor": "tertiary",
+        "opacity": 1.0
+    },
+    "srError": {
+        "label": "Error",
+        "gradient": [["error", 0.0]],
+        "gradientType": "linear",
+        "gradientAngle": 0,
+        "gradientCenterX": 0.5,
+        "gradientCenterY": 0.5,
+        "halftoneDotMin": 0.0,
+        "halftoneDotMax": 2.0,
+        "halftoneStart": 0.0,
+        "halftoneEnd": 1.0,
+        "halftoneDotColor": "overErrorContainer",
+        "halftoneBackgroundColor": "error",
+        "border": ["error", 0],
+        "itemColor": "overError",
+        "opacity": 1.0
+    },
+    "srErrorFocus": {
+        "label": "Error Focus",
+        "gradient": [["overBackground", 0.0]],
+        "gradientType": "linear",
+        "gradientAngle": 0,
+        "gradientCenterX": 0.5,
+        "gradientCenterY": 0.5,
+        "halftoneDotMin": 0.0,
+        "halftoneDotMax": 2.0,
+        "halftoneStart": 0.0,
+        "halftoneEnd": 1.0,
+        "halftoneDotColor": "error",
+        "halftoneBackgroundColor": "overErrorContainer",
+        "border": ["overBackground", 0],
+        "itemColor": "overError",
+        "opacity": 1.0
+    },
+    "srOverError": {
+        "label": "Over Error",
+        "gradient": [["overError", 0.0]],
+        "gradientType": "linear",
+        "gradientAngle": 0,
+        "gradientCenterX": 0.5,
+        "gradientCenterY": 0.5,
+        "halftoneDotMin": 0.0,
+        "halftoneDotMax": 2.0,
+        "halftoneStart": 0.0,
+        "halftoneEnd": 1.0,
+        "halftoneDotColor": "errorContainer",
+        "halftoneBackgroundColor": "overError",
+        "border": ["overError", 0],
+        "itemColor": "error",
+        "opacity": 1.0
+    }
+}
+
+
+
+========================================
+FILE: ./prefix.js
+========================================
+.pragma library
+
+var data = {
+    "clipboard": "cc",
+    "emoji": "ee",
+    "tmux": "tt",
+    "wallpapers": "ww",
+    "notes": "nn"
+}
+
+
+

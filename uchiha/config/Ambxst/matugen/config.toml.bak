@@ -1,0 +1,66 @@
+# ~/.config/matugen/config.toml
+# ─────────────────────────────────────────────────────────────────────────────
+# Driven by ~/.config/ambxst/scripts/theme.sh (or `scripts/theme.sh` in the shell repo).
+# Everything is rendered by ONE matugen run; the shell only reads colors.json.
+#
+# Outputs
+#   ~/.config/ambxst/colors/colors.json                -> read by Quickshell (Colors.qml)
+#   ~/.config/ambxst/colors/kitty-theme.conf           -> `include` it from kitty.conf
+#   ~/.config/ambxst/colors/terminal-sequences.esc     -> theme.sh turns it into live terminal repaint
+#   ~/.config/ambxst/colors/kde-color.txt              -> accent for kde-material-you-colors
+#   ~/.config/gtk-3.0/gtk.css, ~/.config/gtk-4.0/gtk.css
+#   ~/.config/qt5ct/colors/ambxst.colors, ~/.config/qt6ct/colors/ambxst.colors
+#
+# NOTE: only FLAT FILES go in ~/.config/ambxst/colors/ — every sub-directory there
+#       is listed as a colour preset by the shell.
+# ─────────────────────────────────────────────────────────────────────────────
+
+[config]
+
+# Hue-shifted "terminal / semantic" colours. These produce the red/green/blue/…
+# + *Container / over* / *Source / *Value keys the shell already expects.
+[config.custom_colors]
+red     = { color = "#ff0000", blend = true }
+green   = { color = "#00ff00", blend = true }
+yellow  = { color = "#ffff00", blend = true }
+blue    = { color = "#0000ff", blend = true }
+magenta = { color = "#ff00ff", blend = true }
+cyan    = { color = "#00ffff", blend = true }
+white   = { color = "#ffffff", blend = true }
+
+# ── Quickshell ───────────────────────────────────────────────────────────────
+[templates.ambxst_colors]
+input_path  = '~/.config/matugen/templates/ambxst/colors.json'
+output_path = '~/.config/ambxst/colors/colors.json'
+
+# ── Terminals ────────────────────────────────────────────────────────────────
+[templates.ambxst_kitty]
+input_path  = '~/.config/matugen/templates/ambxst/kitty-theme.conf'
+output_path = '~/.config/ambxst/colors/kitty-theme.conf'
+
+[templates.ambxst_terminal_seq]
+input_path  = '~/.config/matugen/templates/ambxst/terminal-sequences.esc'
+output_path = '~/.config/ambxst/colors/terminal-sequences.esc'
+
+# ── GTK 3 / 4 ────────────────────────────────────────────────────────────────
+[templates.ambxst_gtk3]
+input_path  = '~/.config/matugen/templates/ambxst/gtk.css'
+output_path = '~/.config/gtk-3.0/gtk.css'
+
+[templates.ambxst_gtk4]
+input_path  = '~/.config/matugen/templates/ambxst/gtk.css'
+output_path = '~/.config/gtk-4.0/gtk.css'
+
+# ── Qt (qt5ct / qt6ct) ───────────────────────────────────────────────────────
+[templates.ambxst_qt5ct]
+input_path  = '~/.config/matugen/templates/ambxst/qtct.colors'
+output_path = '~/.config/qt5ct/colors/ambxst.colors'
+
+[templates.ambxst_qt6ct]
+input_path  = '~/.config/matugen/templates/ambxst/qtct.colors'
+output_path = '~/.config/qt6ct/colors/ambxst.colors'
+
+# ── kde-material-you-colors (Plasma/Kvantum) ─────────────────────────────────
+[templates.ambxst_kde]
+input_path  = '~/.config/matugen/templates/ambxst/kde-color.txt'
+output_path = '~/.config/ambxst/colors/kde-color.txt'

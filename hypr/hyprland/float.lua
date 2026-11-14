@@ -5,7 +5,7 @@ hl.window_rule({ match = { class = "^(org.kde.dolphin)$", title = "^(Progress Di
 hl.window_rule({ match = { class = "^(org.kde.dolphin)$", title = "^(Copying — Dolphin)$" },         float = true })
 hl.window_rule({ match = { class = "^(org.kde.dolphin)$", title = "^(Copying — Dolphin)$" },         center = true })
 hl.window_rule({ match = { class = "^(org.kde.dolphin)$" },                                           float = true })
-hl.window_rule({ match = { class = "^(org.kde.dolphin)$" },                                           center = true })
+--hl.window_rule({ match = { class = "^(org.kde.dolphin)$" },                                           center = true })
 hl.window_rule({ match = { title = "^(Home — Dolphin)$" },                                            size = { 1100, 720 } })
 
 -- ── Thunar ───────────────────────────────────────────────────────────────────
@@ -30,9 +30,9 @@ hl.window_rule({ match = { class = "^(firefox)$", title = "^(Library)$" },      
 hl.window_rule({ match = { class = "^(zen)$", title = "^(Library)$" }, float = true })
 
 -- ── Kitty system monitors ─────────────────────────────────────────────────────
-hl.window_rule({ match = { class = "^(kitty)$", title = "^(top)$" },  float = true })
-hl.window_rule({ match = { class = "^(kitty)$", title = "^(btop)$" }, float = true })
-hl.window_rule({ match = { class = "^(kitty)$", title = "^(htop)$" }, float = true })
+--hl.window_rule({ match = { class = "^(kitty)$", title = "^(top)$" },  float = true })
+--hl.window_rule({ match = { class = "^(kitty)$", title = "^(btop)$" }, float = true })
+--hl.window_rule({ match = { class = "^(kitty)$", title = "^(htop)$" }, float = true })
 
 -- ── Kitty float class ────────────────────────────────────────────────────────
 hl.window_rule({ match = { class = "^(kitty-float)$" }, float = true })
@@ -81,9 +81,9 @@ hl.window_rule({ match = { title = "^(YouTube Music)$" }, center = true })
 hl.window_rule({ match = { title = "^(YouTube Music)$" }, size = { 450, 700 } })
 
 -- ── VLC ───────────────────────────────────────────────────────────────────────
-hl.window_rule({ match = { class = "^(vlc)$" }, float = true })
-hl.window_rule({ match = { class = "^(vlc)$" }, center = true })
-hl.window_rule({ match = { class = "^(vlc)$" }, size = { 800, 500 } })
+--hl.window_rule({ match = { class = "^(vlc)$" }, float = true })
+--hl.window_rule({ match = { class = "^(vlc)$" }, center = true })
+--hl.window_rule({ match = { class = "^(vlc)$" }, size = { 800, 500 } })
 
 -- ── ProtonVPN ─────────────────────────────────────────────────────────────────
 hl.window_rule({ match = { class = "^(protonvpn-app)$" }, float = true })
@@ -188,3 +188,22 @@ hl.layer_rule({ match = { namespace = "border" }, ignore_alpha = 0.3 })
 -- ── Ambxst ────────────────────────────────────────────────────────────────────
 hl.layer_rule({ match = { namespace = "^(ambxst)$" }, blur = true })
 hl.layer_rule({ match = { namespace = "^(ambxst)$" }, ignore_alpha = 0.5 })
+
+-- ── MissionCenter ────────────────────────────────────────────────────────────────────
+hl.window_rule({ match = { class = "^(io.missioncenter.MissionCenter)$" }, float = true })
+hl.window_rule({ match = { class = "^(io.missioncenter.MissionCenter)$" }, center = true })
+hl.window_rule({ match = { class = "^(io.missioncenter.MissionCenter)$" }, size = { 1300, 830 } })
+
+hl.window_rule({ match = { title = "^(Genshin Impact)$" }, float = true })
+
+hl.window_rule({ match = { class = "^(org.gnome.Calculator)$" }, float = true })
+
+hl.window_rule({ match = { class = "^(An Anime Game Launcher)$" }, float = true })
+hl.window_rule({ match = { class = "^(An Anime Game Launcher)$" }, center = true })
+hl.window_rule({
+    name = "loupe",
+    match = { class = "^org\\.gnome\\.Loupe$" },
+    float = true,
+    max_size = { "monitor_w * 0.8", "monitor_h * 0.8" },
+    center = true,
+})
