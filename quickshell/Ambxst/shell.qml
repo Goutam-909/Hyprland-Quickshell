@@ -23,6 +23,7 @@ import qs.modules.desktop
 import qs.modules.lockscreen
 import qs.modules.dock
 import qs.modules.globals
+import qs.modules.theme
 import qs.modules.shell
 import qs.config
 import qs.modules.shell.osd
@@ -277,6 +278,7 @@ ShellRoot {
 
         Component.onCompleted: {
             // Trigger service creation
+            ThemeLoader.load(); // start watching switchwall.sh output (colors.json + config.json)
             let _ = NightLightService.active;
             _ = GameModeService.toggled;
             _ = CaffeineService.inhibit;
@@ -286,3 +288,5 @@ ShellRoot {
     }
     PolkitWindow {}
 }
+
+

@@ -3398,17 +3398,8 @@ Singleton {
     property int animDuration: Services.GameModeService.toggled ? 0 : theme.animDuration
     property bool tintIcons: theme.tintIcons
 
-    // Handle lightMode changes
-    onLightModeChanged: {
-        console.log("lightMode changed to:", lightMode);
-        if (GlobalStates.wallpaperManager) {
-            var wallpaperManager = GlobalStates.wallpaperManager;
-            if (wallpaperManager.currentWallpaper) {
-                console.log("Re-running Matugen due to lightMode change");
-                wallpaperManager.runMatugenForCurrentWallpaper();
-            }
-        }
-    }
+    // lightMode changes are handled by ThemeLoader (modules/theme/ThemeLoader.qml):
+    // it turns a user flip into `switchwall.sh --mode … --noswitch`.
 
     // Bar configuration
     property QtObject bar: barLoader.adapter
@@ -3562,3 +3553,5 @@ Singleton {
         return Qt.rgba(color.r, color.g, color.b, opacity);
     }
 }
+
+

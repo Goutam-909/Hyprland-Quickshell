@@ -44,7 +44,7 @@ Item {
     readonly property string clockColorKey: instanceConfig.color ?? "auto"
     readonly property color clockColor: {
         if (clockColorKey === "auto")
-            return Colors.primary;
+            return ClockPlacement.autoColor; // primary, light/dark picked for the area behind the clock (end4 rule)
         const resolved = Config.resolveColor(clockColorKey);
         return (resolved && resolved !== "transparent") ? resolved : Colors.primary;
     }
@@ -524,3 +524,5 @@ Item {
         }
     }
 }
+
+

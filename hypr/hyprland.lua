@@ -1,6 +1,5 @@
 -- This file sources other files in `hyprland` and `custom` folders
 -- You wanna add your stuff in files in `custom`
-
 -- Environment variables --
 require("hyprland/env")
 require("custom/env")
@@ -27,4 +26,3 @@ require("monitors")
 require("hyprland/shellOverrides/main")
 require("hyprland/shellOverrides/animations")
 --require("macshell")
-require("ambxst")

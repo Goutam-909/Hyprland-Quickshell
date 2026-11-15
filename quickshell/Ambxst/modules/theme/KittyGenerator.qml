@@ -3,126 +3,40 @@ import Quickshell
 import Quickshell.Io
 import qs.config
 
+/**
+ * Kitty: only the background opacity. Colours come from matugen (shared pipeline); opacity is not
+ * part of it, so it is written straight into kitty.conf (like GtkGenerator does for GTK) and kitty
+ * is told to reload (SIGUSR1).
+ *
+ * Needs `allow_remote_control`-free reload only: SIGUSR1 reloads the config of every running kitty.
+ */
 QtObject {
     id: root
 
-    function generate(Colors) {
-        if (!Colors)
-            return;
-        const fmt = c => c.toString();
+    // kitty.conf that gets edited (symlinks are followed, so dotfile setups keep working)
+    readonly property string confPath: Quickshell.env("HOME") + "/.config/kitty/kitty.conf"
 
-        const cursor = fmt(Colors.overSurface);
-        const cursorText = fmt(Colors.overSurfaceVariant);
+    property string _lastOpacity: ""
 
-        const foreground = fmt(Colors.overSurface);
-        const background = fmt(Colors.background);
-        const selectionForeground = fmt(Colors.overSecondary);
-        const selectionBackground = fmt(Colors.secondaryFixedDim);
-        const urlColor = fmt(Colors.primary);
-        //const backgroundOpacity = Config.theme.srBg.opacity;
+    function generate() {
+        const opacity = Math.max(0, Math.min(1, Config.theme.srBg.opacity)).toFixed(2);
+        if (opacity === root._lastOpacity)
+            return; // nothing changed -> don't touch the file or reload kitty
+        root._lastOpacity = opacity;
 
-        // black
-        const color0 = fmt(Colors.surfaceContainerLow);
-        const color8 = fmt(Colors.surfaceBright);
-
-        // red
-        const color1 = fmt(Colors.red);
-        const color9 = fmt(Colors.lightRed);
-
-        // green
-        const color2 = fmt(Colors.green);
-        const color10 = fmt(Colors.lightGreen);
-
-        // yellow
-        const color3 = fmt(Colors.yellow);
-        const color11 = fmt(Colors.lightYellow);
-
-        // blue
-        // User requested primary for color4
-        const color4 = fmt(Colors.primary);
-        const color12 = fmt(Colors.lightBlue);
-
-        // magenta
-        const color5 = fmt(Colors.magenta);
-        const color13 = fmt(Colors.lightMagenta);
-
-        // cyan
-        const color6 = fmt(Colors.cyan);
-        const color14 = fmt(Colors.lightCyan);
-
-        // white
-        const color7 = fmt(Colors.outline);
-        const color15 = fmt(Colors.overSurface);
-
-        let conf = "";
-        conf += `cursor ${cursor}\n`;
-        conf += `cursor_text_color ${cursorText}\n\n`;
-
-        conf += `foreground ${foreground}\n`;
-        conf += `background ${background}\n`;
-       // conf += `background_opacity ${backgroundOpacity}\n`;
-        conf += `selection_foreground ${selectionForeground}\n`;
-        conf += `selection_background ${selectionBackground}\n`;
-        conf += `url_color ${urlColor}\n\n`;
-
-        conf += `# black\n`;
-        conf += `color0 ${color0}\n`;
-        conf += `color8 ${color8}\n\n`;
-
-        conf += `# red\n`;
-        conf += `color1 ${color1}\n`;
-        conf += `color9 ${color9}\n\n`;
-
-        conf += `# green\n`;
-        conf += `color2 ${color2}\n`;
-        conf += `color10 ${color10}\n\n`;
-
-        conf += `# yellow\n`;
-        conf += `color3 ${color3}\n`;
-        conf += `color11 ${color11}\n\n`;
-
-        conf += `# blue\n`;
-        conf += `color4 ${color4}\n`;
-        conf += `color12 ${color12}\n\n`;
-
-        conf += `# magenta\n`;
-        conf += `color5 ${color5}\n`;
-        conf += `color13 ${color13}\n\n`;
-
-        conf += `# cyan\n`;
-        conf += `color6 ${color6}\n`;
-        conf += `color14 ${color14}\n\n`;
-
-        conf += `# white\n`;
-        conf += `color7 ${color7}\n`;
-        conf += `color15 ${color15}\n`;
-
-        writer.text = conf;
-
-        const kittyConfPath = Quickshell.cachePath("kitty.conf");
-
-        // Ensure directory exists and write file
-        const cmd = `
-            mkdir -p "$(dirname "${kittyConfPath}")" && \\
-            echo "${conf}" > "${kittyConfPath}" && \\
-            pkill -SIGUSR1 kitty
-        `;
-
-        writerProcess.command = ["sh", "-c", cmd];
+        // $1 = conf, $2 = opacity. Replaces the active `background_opacity` line (commented ones are left
+        // alone); appends it if there is none. Then reloads running kitty windows.
+        const script = 'conf=$(readlink -f "$1" 2>/dev/null || echo "$1"); mkdir -p "$(dirname "$conf")"; touch "$conf"; ' +
+            'if grep -qE "^[[:space:]]*background_opacity[[:space:]]" "$conf"; then ' +
+            'sed -i -E "s/^[[:space:]]*background_opacity[[:space:]].*/background_opacity $2/" "$conf"; ' +
+            'else printf "\\nbackground_opacity %s\\n" "$2" >> "$conf"; fi; ' +
+            'pkill -SIGUSR1 kitty; exit 0';
+        writerProcess.command = ["bash", "-c", script, "_", root.confPath, opacity];
         writerProcess.running = true;
     }
 
-    property QtObject writer: QtObject {
-        id: writer
-        property string text
-    }
-
     property Process writerProcess: Process {
-        id: writerProcess
         running: false
-        stdout: StdioCollector {
-            onStreamFinished: console.log("KittyGenerator: Colors generated.")
-        }
         stderr: StdioCollector {
             onStreamFinished: err => {
                 if (err)

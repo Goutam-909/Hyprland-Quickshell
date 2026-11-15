@@ -10,7 +10,7 @@ import qs.config
 Item {
     id: root
     property bool schemeListExpanded: false
-    readonly property var matugenSchemes: ["scheme-content", "scheme-expressive", "scheme-fidelity", "scheme-fruit-salad", "scheme-monochrome", "scheme-neutral", "scheme-rainbow", "scheme-tonal-spot"]
+    readonly property var matugenSchemes: ["auto", "scheme-content", "scheme-expressive", "scheme-fidelity", "scheme-fruit-salad", "scheme-monochrome", "scheme-neutral", "scheme-rainbow", "scheme-tonal-spot"]
     property var presets: GlobalStates.wallpaperManager ? GlobalStates.wallpaperManager.colorPresets : []
     onPresetsChanged: console.log("SchemeSelector received presets:", presets)
 
@@ -118,6 +118,7 @@ Item {
 
     function getSchemeDisplayName(scheme) {
         const map = {
+            "auto": "Auto (from image)",
             "scheme-content": "Content",
             "scheme-expressive": "Expressive",
             "scheme-fidelity": "Fidelity",
@@ -506,3 +507,5 @@ Item {
         }
     }
 }
+
+

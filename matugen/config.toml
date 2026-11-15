@@ -1,6 +1,7 @@
 [config]
 version_check = false
 
+
 [templates.m3colors]
 input_path = '~/.config/matugen/templates/colors.json'
 output_path = '~/.config/uchiha/colors/colors.json'
@@ -29,9 +30,9 @@ output_path = '~/.config/uchiha/colors/color.txt'
 input_path = '~/.config/matugen/templates/wallpaper.txt'
 output_path = '~/.config/uchiha/colors/path.txt'
 
-[templates.kitty]
-input_path = '~/.config/matugen/templates/Kitty/colors-kitty.conf'
-output_path = '~/.config/uchiha/colors/colors-kitty.conf'
+#[templates.kitty]
+#input_path = '~/.config/matugen/templates/Kitty/colors-kitty.conf'
+#output_path = '~/.config/uchiha/colors/colors-kitty.conf'
 
 [templates.kvantum]
 input_path = '~/.config/matugen/templates/kvantum/KvGlass.kvconfig'
@@ -49,6 +50,29 @@ output_path = '~/.config/rofi/colors/matugen.rasi'
 input_path = '~/.config/matugen/templates/colors-waybar.css'
 output_path = '~/.config/uchiha/colors/colors-waybar.css'
 
-[templates.fish]
-input_path = '~/.config/matugen/templates/fish-sequences.txt'
-output_path = '~/.config/uchiha/colors/fish-sequences.txt'
+[templates.ambxst]
+input_path = '~/.config/matugen/templates/colors-ambxst.json'
+output_path = '~/.config/uchiha/colors/colors-ambxst.json'
+
+
+[config.custom_colors.red]
+color = "#FF0000"
+blend = true
+[config.custom_colors.green]
+color = "#00FF00"
+blend = true
+[config.custom_colors.yellow]
+color = "#FFFF00"
+blend = true
+[config.custom_colors.blue]
+color = "#0000FF"
+blend = true
+[config.custom_colors.magenta]
+color = "#FF00FF"
+blend = true
+[config.custom_colors.cyan]
+color = "#00FFFF"
+blend = true
+[config.custom_colors.white]
+color = "#FFFFFF"
+blend = true

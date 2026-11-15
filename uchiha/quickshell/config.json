@@ -72,9 +72,9 @@
         ],
         "showGrid": true,
         "showSnapLines": true,
-        "thumbnailPath": "/home/goutam/.config/hypr/custom/scripts/mpvpaper_thumbnails/vagabond-path-of-blades.3840x2160.mp4.jpg",
+        "thumbnailPath": "/home/goutam/.config/hypr/custom/scripts/mpvpaper_thumbnails/Chill Cat Coffe.mp4.jpg",
         "wallpaperAnimation": "circleSelect",
-        "wallpaperPath": "/home/goutam/Pictures/Wallpapers/wallhaven-49mzvd.jpg",
+        "wallpaperPath": "/home/goutam/Pictures/Wallpapers/0152.jpg",
         "widgets": {
             "blurRadius": 33.332152061855666,
             "blurWidgets": true,
@@ -127,7 +127,7 @@
                 "showOnlyWhenLocked": false,
                 "style": "pixel",
                 "styleLocked": "cookie",
-                "x": 96,
+                "x": 108,
                 "y": 288
             },
             "colorScheme": "default",
@@ -202,7 +202,7 @@
                 "y": 456
             },
             "resources": {
-                "enable": true,
+                "enable": false,
                 "placementStrategy": "free",
                 "vertical": true,
                 "x": 1620,
@@ -316,7 +316,7 @@
             "showPerformanceProfileToggle": false,
             "showScreenRecord": true,
             "showScreenSnip": true,
-            "showWallpaperToggle": true
+            "showWallpaperToggle": false
         },
         "verbose": true,
         "vertical": false,
@@ -336,7 +336,7 @@
             "showAppIcons": true,
             "showNumberDelay": 300,
             "shown": 8,
-            "style": "pill",
+            "style": "default",
             "useNerdFont": false
         }
     },
@@ -666,7 +666,7 @@
     },
     "sidebar": {
         "banner": true,
-        "bannerImage": "",
+        "bannerImage": "/home/goutam/Pictures/preview.jpg",
         "booru": {
             "allowNsfw": false,
             "defaultProvider": "yandere",

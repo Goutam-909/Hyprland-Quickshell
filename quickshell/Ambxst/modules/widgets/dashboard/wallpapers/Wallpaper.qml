@@ -6,7 +6,6 @@ import Quickshell.Io
 import qs.modules.globals
 import qs.modules.theme
 import qs.config
-import "MpvShaderGenerator.js" as ShaderGenerator
 
 PanelWindow {
     id: wallpaper
@@ -24,28 +23,32 @@ PanelWindow {
 
     color: "transparent"
 
+
     property string wallpaperDir: wallpaperConfig.adapter.wallPath
     property string fallbackDir: decodeURIComponent(Qt.resolvedUrl("../../../../assets/wallpapers_example").toString().replace("file://", ""))
     property var wallpaperPaths: []
     property var subfolderFilters: []
     property var allSubdirs: []
-    property int currentIndex: 0
-    property string currentWallpaper: initialLoadCompleted && wallpaperPaths.length > 0 ? wallpaperPaths[currentIndex] : ""
-    property bool initialLoadCompleted: false
     property bool usingFallback: false
     property bool _wallpaperDirInitialized: false
-    property string currentMatugenScheme: wallpaperConfig.adapter.matugenScheme
-    property alias tintEnabled: wallpaperAdapter.tintEnabled
-    property alias sourceColorIndex: wallpaperAdapter.sourceColorIndex
-    property alias sourceColors: wallpaperAdapter.sourceColors
-    property alias legacyMatugen: wallpaperAdapter.legacyMatugen
+    property bool _firstRunHandled: false
+    property string _pendingTarget: ""
     property int thumbnailsVersion: 0
 
-    readonly property string mpvShaderDir: Quickshell.cacheDir + "/mpv_shaders"
-    property string mpvShaderPath: ""
-    property bool mpvShaderReady: false
+    // ── Wallpaper / theme state is owned by switchwall.sh ───────────────────────
+    // switchwall.sh writes ~/.config/uchiha/quickshell/config.json (shared with end4-pC);
+    // ThemeLoader watches it. Nothing here runs matugen or keeps its own copy.
+    readonly property string currentWallpaper: ThemeLoader.wallpaperPath
+    readonly property int currentIndex: wallpaperPaths.indexOf(currentWallpaper)
+    readonly property bool initialLoadCompleted: ThemeLoader.configLoaded
+    readonly property string currentMatugenScheme: ThemeLoader.paletteType
+    readonly property bool currentIsVideo: getFileType(currentWallpaper) === 'video'
 
-    readonly property var optimizedPalette: ["background", "overBackground", "shadow", "surface", "surfaceBright", "surfaceDim", "surfaceContainer", "surfaceContainerHigh", "surfaceContainerHighest", "surfaceContainerLow", "surfaceContainerLowest", "primary", "secondary", "tertiary", "red", "lightRed", "green", "lightGreen", "blue", "lightBlue", "yellow", "lightYellow", "cyan", "lightCyan", "magenta", "lightMagenta"]
+    // Compat stubs for UI/consumers that still read these (tint and the source-colour picker are gone)
+    readonly property bool tintEnabled: false
+    readonly property var sourceColors: []
+    readonly property int sourceColorIndex: 0
+    readonly property bool legacyMatugen: true
 
     // Sync state from the primary wallpaper manager to secondary instances
     Binding {
@@ -57,23 +60,17 @@ PanelWindow {
 
     Binding {
         target: wallpaper
-        property: "currentIndex"
-        value: GlobalStates.wallpaperManager.currentIndex
-        when: GlobalStates.wallpaperManager !== null && GlobalStates.wallpaperManager !== wallpaper
-    }
-
-    Binding {
-        target: wallpaper
         property: "subfolderFilters"
         value: GlobalStates.wallpaperManager.subfolderFilters
         when: GlobalStates.wallpaperManager !== null && GlobalStates.wallpaperManager !== wallpaper
     }
 
+    // Tell ThemeLoader when a transition is loading/running so the shell-wide colour change waits for it
     Binding {
-        target: wallpaper
-        property: "initialLoadCompleted"
-        value: GlobalStates.wallpaperManager.initialLoadCompleted
-        when: GlobalStates.wallpaperManager !== null && GlobalStates.wallpaperManager !== wallpaper
+        target: ThemeLoader
+        property: "uiBusy"
+        value: wallpaper._transitionPending || transitionAnim.running
+        when: GlobalStates.wallpaperManager === wallpaper
     }
 
     property string colorPresetsDir: Quickshell.env("HOME") + "/.config/ambxst/colors"
@@ -83,52 +80,23 @@ PanelWindow {
     onColorPresetsChanged: console.log("Color Presets Updated:", colorPresets)
     property string activeColorPreset: wallpaperConfig.adapter.activeColorPreset || ""
 
-    // React to light/dark mode changes
-    property bool isLightMode: Config.theme.lightMode
-    onIsLightModeChanged: {
-        if (activeColorPreset) {
-            applyColorPreset();
-        } else {
-            runMatugenForCurrentWallpaper();
-        }
-    }
-
-    onActiveColorPresetChanged: {
-        if (activeColorPreset) {
-            applyColorPreset();
-        } else {
-            runMatugenForCurrentWallpaper();
-        }
+    // A local colour preset overrides colors.json inside THIS shell only (see ThemeLoader).
+    // Only the primary instance drives the shared singleton.
+    Binding {
+        target: ThemeLoader
+        property: "activePreset"
+        value: wallpaper.activeColorPreset
+        when: GlobalStates.wallpaperManager === wallpaper
     }
 
     function scanColorPresets() {
         scanPresetsProcess.running = true;
     }
 
-    function applyColorPreset() {
-        if (!activeColorPreset)
-            return;
-
-        var mode = Config.theme.lightMode ? "light.json" : "dark.json";
-
-        var officialFile = officialColorPresetsDir + "/" + activeColorPreset + "/" + mode;
-        var userFile = colorPresetsDir + "/" + activeColorPreset + "/" + mode;
-        var dest = Quickshell.cachePath("colors.json");
-
-        // Try official first, then user. Use bash conditional.
-        var cmd = "if [ -f '" + officialFile + "' ]; then cp '" + officialFile + "' '" + dest + "'; else cp '" + userFile + "' '" + dest + "'; fi";
-
-        console.log("Applying color preset:", activeColorPreset);
-        applyPresetProcess.command = ["bash", "-c", cmd];
-        applyPresetProcess.running = true;
-    }
-
     function setColorPreset(name) {
         wallpaperConfig.adapter.activeColorPreset = name;
-        // activeColorPreset property will update automatically via binding to adapter
     }
 
-    // Funciones utilitarias para tipos de archivo
     function getFileType(path) {
         var extension = path.toLowerCase().split('.').pop();
         if (['jpg', 'jpeg', 'png', 'webp', 'tif', 'tiff', 'bmp'].includes(extension)) {
@@ -273,28 +241,38 @@ PanelWindow {
             delayedThumbnailGen.start();
     }
 
-    onCurrentWallpaperChanged:
-    // Matugen se ejecuta manualmente en las funciones de cambio
-    {}
+
+    // ── Wallpaper switching: everything goes through switchwall.sh ──────────────
+    // currentWallpaper updates when switchwall.sh has written config.json, so this also
+    // reacts to changes made by end4-pC's shell or from a terminal.
+    onCurrentWallpaperChanged: {
+        _pendingTarget = "";
+        if (currentWallpaper && GlobalStates.wallpaperManager === wallpaper)
+            _scheduleFollowUp();
+    }
 
     function setWallpaper(path) {
         if (GlobalStates.wallpaperManager && GlobalStates.wallpaperManager !== wallpaper) {
             GlobalStates.wallpaperManager.setWallpaper(path);
             return;
         }
-
+        if (!path)
+            return;
         console.log("setWallpaper called with:", path);
-        initialLoadCompleted = true;
-        var pathIndex = wallpaperPaths.indexOf(path);
-        if (pathIndex !== -1) {
-            currentIndex = pathIndex;
-            wallpaperConfig.adapter.currentWall = path;
-            runMatugenForCurrentWallpaper();
-            runClockPositionForWallpaper();
-            generateLockscreenFrame(path);
-        } else {
-            console.warn("Wallpaper path not found in current list:", path);
-        }
+        _pendingTarget = path;
+        pendingTargetReset.restart();
+        ThemeLoader.applyWallpaper(path);
+    }
+
+    // Steps from the last *requested* wallpaper so rapid next/previous presses
+    // don't all resolve to the same neighbour while switchwall.sh is still running.
+    function _step(delta) {
+        var n = wallpaperPaths.length;
+        if (n === 0)
+            return;
+        var base = wallpaperPaths.indexOf(_pendingTarget || currentWallpaper);
+        var idx = base < 0 ? (delta > 0 ? 0 : n - 1) : (base + delta + n) % n;
+        setWallpaper(wallpaperPaths[idx]);
     }
 
     function nextWallpaper() {
@@ -302,16 +280,7 @@ PanelWindow {
             GlobalStates.wallpaperManager.nextWallpaper();
             return;
         }
-
-        if (wallpaperPaths.length === 0)
-            return;
-        initialLoadCompleted = true;
-        currentIndex = (currentIndex + 1) % wallpaperPaths.length;
-        currentWallpaper = wallpaperPaths[currentIndex];
-        wallpaperConfig.adapter.currentWall = wallpaperPaths[currentIndex];
-        runMatugenForCurrentWallpaper();
-        runClockPositionForWallpaper();
-        generateLockscreenFrame(wallpaperPaths[currentIndex]);
+        _step(1);
     }
 
     function previousWallpaper() {
@@ -319,16 +288,7 @@ PanelWindow {
             GlobalStates.wallpaperManager.previousWallpaper();
             return;
         }
-
-        if (wallpaperPaths.length === 0)
-            return;
-        initialLoadCompleted = true;
-        currentIndex = currentIndex === 0 ? wallpaperPaths.length - 1 : currentIndex - 1;
-        currentWallpaper = wallpaperPaths[currentIndex];
-        wallpaperConfig.adapter.currentWall = wallpaperPaths[currentIndex];
-        runMatugenForCurrentWallpaper();
-        runClockPositionForWallpaper();
-        generateLockscreenFrame(wallpaperPaths[currentIndex]);
+        _step(-1);
     }
 
     function setWallpaperByIndex(index) {
@@ -336,325 +296,107 @@ PanelWindow {
             GlobalStates.wallpaperManager.setWallpaperByIndex(index);
             return;
         }
-
-        if (index >= 0 && index < wallpaperPaths.length) {
-            initialLoadCompleted = true;
-            currentIndex = index;
-            currentWallpaper = wallpaperPaths[currentIndex];
-            wallpaperConfig.adapter.currentWall = wallpaperPaths[currentIndex];
-            runMatugenForCurrentWallpaper();
-            runClockPositionForWallpaper();
-            generateLockscreenFrame(wallpaperPaths[currentIndex]);
-        }
+        if (index >= 0 && index < wallpaperPaths.length)
+            setWallpaper(wallpaperPaths[index]);
     }
 
-    // Función para re-ejecutar Matugen con el wallpaper actual
+    // scheme: scheme-content | scheme-expressive | scheme-fidelity | scheme-fruit-salad |
+    //         scheme-monochrome | scheme-neutral | scheme-rainbow | scheme-tonal-spot | auto
     function setMatugenScheme(scheme) {
-        wallpaperConfig.adapter.matugenScheme = scheme;
-
-        if (wallpaperConfig.adapter.activeColorPreset) {
-            console.log("Switching to Matugen scheme, clearing preset");
+        if (GlobalStates.wallpaperManager && GlobalStates.wallpaperManager !== wallpaper) {
+            GlobalStates.wallpaperManager.setMatugenScheme(scheme);
+            return;
+        }
+        if (wallpaperConfig.adapter.activeColorPreset)
             wallpaperConfig.adapter.activeColorPreset = "";
-        } else {
-            runMatugenForCurrentWallpaper();
-        }
+        ThemeLoader.setScheme(scheme);
     }
-
-    property string mpvSocket: "/tmp/ambxst_mpv_socket"
-
-    // Path to the matugen PTY picker script
-    readonly property string matugenPickScript: decodeURIComponent(Qt.resolvedUrl("../../../../scripts/matugen_pick.sh").toString().replace("file://", ""))
-    readonly property string matugenConfigToml: decodeURIComponent(Qt.resolvedUrl("../../../../assets/matugen/config.toml").toString().replace("file://", ""))
-    readonly property string matugenStateFile: "/tmp/ambxst_matugen_state.json"
-    readonly property string clockPositionScript: decodeURIComponent(Qt.resolvedUrl("../../../../scripts/clock_position.sh").toString().replace("file://", ""))
-
-    function runMatugenForCurrentWallpaper() {
-        if (activeColorPreset) {
-            console.log("Skipping Matugen because color preset is active:", activeColorPreset);
-            return;
-        }
-
-        if (currentWallpaper && initialLoadCompleted) {
-            console.log("Running Matugen for current wallpaper:", currentWallpaper);
-
-            var matugenSource = getColorSource(currentWallpaper);
-            var mode = Config.theme.lightMode ? "light" : "dark";
-            var idx = wallpaperConfig.adapter.sourceColorIndex || 0;
-
-            console.log("Using source for matugen:", matugenSource, "index:", idx);
-
-            // Stop existing processes if running
-            if (matugenProcessWithConfig.running) matugenProcessWithConfig.running = false;
-            if (matugenProcessNormal.running) matugenProcessNormal.running = false;
-
-            // Run via PTY picker script (with config toml)
-            matugenProcessWithConfig.command = [
-                "bash", matugenPickScript,
-                String(idx), matugenSource,
-                wallpaperConfig.adapter.matugenScheme,
-                mode,
-                matugenConfigToml,
-                matugenStateFile,
-                wallpaperConfig.adapter.legacyMatugen ? "1" : "0"
-            ];
-            matugenProcessWithConfig.running = true;
-
-            // Run normal matugen in parallel (no config toml)
-            matugenProcessNormal.command = [
-                "bash", matugenPickScript,
-                String(idx), matugenSource,
-                wallpaperConfig.adapter.matugenScheme,
-                mode,
-                "",  // no config toml
-                "/tmp/ambxst_matugen_state_normal.json",
-                wallpaperConfig.adapter.legacyMatugen ? "1" : "0"
-            ];
-            matugenProcessNormal.running = true;
-        }
-    }
-
-    // Runs clock_position.sh whenever a new wallpaper is set (only when clock is enabled).
-    // The bash script activates the venv, finds the least-busy region in the image
-    // (or its cached thumbnail for videos/GIFs), and patches clockX/clockY in desktop.json.
-    function runClockPositionForWallpaper() {
-        if (!(Config.desktop.clockEnabled ?? false))
-            return;
-        if (!currentWallpaper || !initialLoadCompleted)
-            return;
-
-        if (clockPositionProcess.running)
-            clockPositionProcess.running = false;
-
-        clockPositionProcess.command = ["bash", clockPositionScript, currentWallpaper];
-        clockPositionProcess.running = true;
-    }
-
-    // Toggle between the new PTY color picker (4 source colors) and the
-    // legacy direct matugen call (--source-color-index, no PTY)
-    function setLegacyMatugen(enabled) {
-        wallpaperConfig.adapter.legacyMatugen = enabled;
-        wallpaperConfig.writeAdapter();
-        runMatugenForCurrentWallpaper();
-    }
-
-    // Called from WallpapersTab when user picks a source color swatch (0-3)
-    function setSourceColor(idx) {
-        if (!currentWallpaper) return;
-        wallpaperConfig.adapter.sourceColorIndex = idx;
-        wallpaperConfig.writeAdapter();
-        runMatugenForCurrentWallpaper();
-    }
-
-    function updateMpvRuntime(enable) {
-        var cmdString;
-        if (enable) {
-            // Since we are using unique filenames, we can just set the new path.
-            // MPV will handle the switch smoothly and won't use cached versions.
-            var setCmd = JSON.stringify({
-                "command": ["set_property", "glsl-shaders", mpvShaderPath]
-            });
-            cmdString = "test -S " + mpvSocket + " && echo '" + setCmd + "' | socat - " + mpvSocket;
-        } else {
-            // Clear shaders
-            var jsonCmd = JSON.stringify({
-                "command": ["set_property", "glsl-shaders", ""]
-            });
-            cmdString = "test -S " + mpvSocket + " && echo '" + jsonCmd + "' | socat - " + mpvSocket;
-        }
-
-        mpvIpcProcess.command = ["bash", "-c", cmdString];
-        mpvIpcProcess.running = true;
-    }
-
-    function updateMpvShader() {
-        if (!wallpaperAdapter.tintEnabled) {
-            updateMpvRuntime(false);
-            return;
-        }
-
-        var colors = [];
-        // Log the first color to see if it changed
-        var firstColorRaw = Colors[optimizedPalette[0]];
-        console.log("Generating MPV shader. First palette color (" + optimizedPalette[0] + "):", firstColorRaw);
-
-        for (var i = 0; i < optimizedPalette.length; i++) {
-            var rawColor = Colors[optimizedPalette[i]];
-            if (rawColor) {
-                var c = Qt.darker(rawColor, 1.0);
-                if (c && !isNaN(c.r) && !isNaN(c.g) && !isNaN(c.b)) {
-                    colors.push({
-                        r: c.r,
-                        g: c.g,
-                        b: c.b
-                    });
-                }
-            }
-        }
-
-        if (colors.length === 0) {
-            console.warn("MpvShaderGenerator: No valid colors found for palette! Aborting.");
-            return;
-        }
-
-        var shaderContent = ShaderGenerator.generate(colors);
-
-        // Generate a unique filename in a dedicated directory
-        var timestamp = Date.now();
-        var currentShaderPath = mpvShaderDir + "/tint_" + timestamp + ".glsl";
-
-        // Store the current active path so updateMpvRuntime knows which one to use
-        wallpaper.mpvShaderPath = currentShaderPath;
-
-        var cmd = ["python3", "-c", "import sys, os, pathlib; " + "d = pathlib.Path(sys.argv[1]); " + "d.mkdir(parents=True, exist_ok=True); " + "[f.unlink() for f in d.iterdir() if f.is_file()]; " + "pathlib.Path(sys.argv[2]).write_text(sys.argv[3]); " + "print('Wrote shader to ' + sys.argv[2]); " + "legacy_dir = os.path.dirname(sys.argv[1]); " + "[pathlib.Path(legacy_dir, f).unlink(missing_ok=True) for f in ['mpv_tint_0.glsl', 'mpv_tint_1.glsl', 'mpv_tint.glsl']]", mpvShaderDir, currentShaderPath, shaderContent];
-
-        mpvShaderWriter.command = cmd;
-        mpvShaderWriter.running = true;
-    }
-
-    property int ipcRetryCount: 0
 
     Timer {
-        id: ipcRetryTimer
-        interval: 200
-        repeat: false
-        onTriggered: {
-            // Retry the last command (which is currently set in mpvIpcProcess)
-            mpvIpcProcess.running = true;
+        id: pendingTargetReset
+        interval: 4000
+        onTriggered: wallpaper._pendingTarget = ""
+    }
+
+    // First run only: shared config.json has no wallpaper yet -> use the first one we found.
+    function _maybeFirstRun() {
+        if (_firstRunHandled || GlobalStates.wallpaperManager !== wallpaper)
+            return;
+        if (!ThemeLoader.configLoaded || wallpaperPaths.length === 0)
+            return;
+        _firstRunHandled = true;
+        if (!ThemeLoader.wallpaperPath) {
+            console.log("No wallpaper in shared config.json, applying first one:", wallpaperPaths[0]);
+            ThemeLoader.applyWallpaper(wallpaperPaths[0]);
         }
     }
 
-    Process {
-        id: mpvIpcProcess
-        running: false
-        onExited: code => {
-            if (code !== 0) {
-                // code 1 from test -S means socket doesn't exist (mpvpaper not running) - not an error
-                if (code === 1) {
-                    ipcRetryCount = 0;
-                    return;
-                }
-                console.warn("MPV IPC failed (is mpvpaper running?) Code:", code);
-                if (ipcRetryCount < 10) {
-                    ipcRetryCount++;
-                    console.log("Retrying IPC (" + ipcRetryCount + "/10)...");
-                    ipcRetryTimer.restart();
-                }
-            } else {
-                ipcRetryCount = 0;
-            }
+    onWallpaperPathsChanged: _maybeFirstRun()
+
+    Connections {
+        target: ThemeLoader
+        function onConfigLoadedChanged() {
+            wallpaper._maybeFirstRun();
+        }
+        function onThumbnailPathChanged() {
+            // video wallpapers: the clock is placed from the thumbnail switchwall.sh makes
+            if (wallpaper.currentIsVideo && GlobalStates.wallpaperManager === wallpaper)
+                wallpaper._scheduleFollowUp();
         }
     }
 
-    Process {
-        id: mpvShaderWriter
-        running: false
-        command: []
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                if (text.length > 0) {
-                    console.log("mpvShaderWriter stdout:", text);
-                }
-            }
-        }
-
-        stderr: StdioCollector {
-            onStreamFinished: {
-                if (text.length > 0) {
-                    console.warn("mpvShaderWriter stderr:", text);
-                }
-            }
-        }
-
-        onExited: code => {
-            if (code === 0) {
-                console.log("MPV tint shader generated at:", mpvShaderPath);
-                mpvShaderReady = true;
-                // Apply immediately via IPC
-                updateMpvRuntime(true);
-            } else {
-                console.warn("Failed to generate MPV shader");
-            }
-        }
+    // ── Deferred follow-up work ─────────────────────────────────────────────────
+    // Python jobs (clock placement, lockscreen frame) must not run while switchwall.sh
+    // (matugen + python) and the transition are using the CPU/GPU. They run later, one after
+    // the other, at low priority.
+    function _scheduleFollowUp() {
+        followUpClock.restart();
+        followUpLock.restart();
     }
 
-    // Trigger update when colors change
     Timer {
-        id: shaderUpdateDebounce
-        interval: 500
+        id: followUpClock
+        interval: 2500
+        onTriggered: ClockPlacement.update(wallpaper.currentIsVideo ? ThemeLoader.thumbnailPath : wallpaper.currentWallpaper)
+    }
+
+    Timer {
+        id: followUpLock
+        interval: 6000
         onTriggered: {
-            console.log("Shader debounce triggered, updating MPV...");
-            updateMpvShader();
+            if (wallpaper.currentWallpaper)
+                wallpaper.generateLockscreenFrame(wallpaper.currentWallpaper);
         }
-    }
-
-    Connections {
-        target: Colors
-        // Watch for file reload (theme change)
-        function onFileChanged() {
-            console.log("Colors file changed, scheduling update...");
-            shaderUpdateDebounce.restart();
-        }
-        // Watch for background change (OLED mode often affects this first/only)
-        function onBackgroundChanged() {
-            console.log("Colors background changed, scheduling update...");
-            shaderUpdateDebounce.restart();
-        }
-        // Fallback
-        function onPrimaryChanged() {
-            console.log("Colors primary changed, scheduling update...");
-            shaderUpdateDebounce.restart();
-        }
-    }
-
-    Connections {
-        target: Config
-        function onOledModeChanged() {
-            console.log("Config OLED mode changed, scheduling update...");
-            shaderUpdateDebounce.restart();
-        }
-    }
-
-    onTintEnabledChanged: {
-        console.log("Tint enabled changed to", tintEnabled);
-        updateMpvShader();
     }
 
     Component.onCompleted: {
+        // Every screen's instance shows the current wallpaper right away
+        if (displayPath !== "")
+            _show(displayPath);
+
         // Only the first Wallpaper instance should manage scanning
         // Other instances (for other screens) share the same data via GlobalStates
         if (GlobalStates.wallpaperManager !== null) {
-            // Another instance already registered, skip initialization
             _wallpaperDirInitialized = true;
             return;
         }
 
         GlobalStates.wallpaperManager = wallpaper;
 
-        // Verificar si existe wallpapers.json, si no, crear con fallback
         checkWallpapersJson.running = true;
 
-        // Initial scans - do these once after config is loaded
         scanColorPresets();
-        // Start directory monitoring
         presetsWatcher.reload();
         officialPresetsWatcher.reload();
-        // Load initial wallpaper config - this will trigger onWallPathChanged which does the actual scan
+        // Triggers onWallPathChanged which does the actual scan
         wallpaperConfig.reload();
 
-        // Generate lockscreen frame for initial wallpaper after a short delay
-        Qt.callLater(function () {
-            if (currentWallpaper) {
-                generateLockscreenFrame(currentWallpaper);
-                runClockPositionForWallpaper();
-            }
-            // Force shader generation on startup if enabled
-            if (tintEnabled) {
-                updateMpvShader();
-            }
-        });
+        if (currentWallpaper)
+            _scheduleFollowUp();
     }
 
+    // wallpapers.json now only keeps shell-local UI state (browse folder, local preset).
+    // Wallpaper path, scheme and colours are NOT stored here any more.
     FileView {
         id: wallpaperConfig
         path: Quickshell.cachePath("wallpapers.json")
@@ -668,60 +410,16 @@ PanelWindow {
         }
 
         onFileChanged: reload()
+        // One writer only: every screen has its own copy of this FileView.
         onAdapterUpdated: {
-            // Ensure matugenScheme has a default value
-            if (!wallpaperConfig.adapter.matugenScheme) {
-                wallpaperConfig.adapter.matugenScheme = "scheme-tonal-spot";
-            }
-            // Update the currentMatugenScheme property to trigger UI updates
-            currentMatugenScheme = Qt.binding(function () {
-                return wallpaperConfig.adapter.matugenScheme;
-            });
-            writeAdapter();
+            if (GlobalStates.wallpaperManager === wallpaper)
+                writeAdapter();
         }
 
         JsonAdapter {
             id: wallpaperAdapter
-            property string currentWall: ""
             property string wallPath: ""
-            property string matugenScheme: "scheme-tonal-spot"
             property string activeColorPreset: ""
-            property bool tintEnabled: false
-            property int sourceColorIndex: 0
-            property var sourceColors: []
-            property bool legacyMatugen: false
-
-            onActiveColorPresetChanged: {
-                if (wallpaperConfig.adapter.activeColorPreset !== wallpaper.activeColorPreset) {
-                    wallpaper.activeColorPreset = wallpaperConfig.adapter.activeColorPreset || "";
-                }
-            }
-
-            onCurrentWallChanged: {
-                // Skip during initial load - scanWallpapers handles this
-                if (!wallpaper._wallpaperDirInitialized)
-                    return;
-
-                // Siempre actualizar si es diferente al actual
-                if (currentWall && currentWall !== wallpaper.currentWallpaper) {
-                    // If paths are not loaded yet, wait for scanWallpapers to finish
-                    if (wallpaper.wallpaperPaths.length === 0) {
-                        return;
-                    }
-
-                    var pathIndex = wallpaper.wallpaperPaths.indexOf(currentWall);
-                    if (pathIndex !== -1) {
-                        wallpaper.currentIndex = pathIndex;
-                        if (!wallpaper.initialLoadCompleted) {
-                            wallpaper.initialLoadCompleted = true;
-                        }
-                        wallpaper.runMatugenForCurrentWallpaper();
-                        wallpaper.runClockPositionForWallpaper();
-                    } else {
-                        console.warn("Saved wallpaper not found in current list:", currentWall);
-                    }
-                }
-            }
 
             onWallPathChanged: {
                 if (wallPath) {
@@ -761,118 +459,6 @@ PanelWindow {
             } else {
                 console.log("wallpapers.json exists");
             }
-        }
-    }
-
-    Process {
-        id: matugenProcessWithConfig
-        running: false
-        command: []
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                if (text.length > 0) {
-                    console.log("Matugen (with config) output:", text);
-                }
-            }
-        }
-
-        stderr: StdioCollector {
-            onStreamFinished: {
-                if (text.length > 0) {
-                    console.warn("Matugen (with config) error:", text);
-                }
-            }
-        }
-
-        onExited: function(exitCode) {
-            console.log("Matugen with config finished, exit:", exitCode);
-            // Read back extracted source colors from state file (picker mode only)
-            if (!wallpaperConfig.adapter.legacyMatugen)
-                stateReader.running = true;
-        }
-    }
-
-    // Reads matugen_state.json after matugen finishes to update sourceColors in UI
-    Process {
-        id: stateReader
-        running: false
-        command: ["cat", wallpaper.matugenStateFile]
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                if (text.length > 0) {
-                    try {
-                        var state = JSON.parse(text);
-                        if (state.sourceColors && state.sourceColors.length > 0) {
-                            wallpaperConfig.adapter.sourceColors = state.sourceColors;
-                            wallpaperConfig.writeAdapter();
-                            console.log("Source colors updated:", state.sourceColors);
-                        }
-                    } catch(e) {
-                        console.warn("Failed to parse matugen state:", e);
-                    }
-                }
-            }
-        }
-    }
-
-    Process {
-        id: matugenProcessNormal
-        running: false
-        command: []
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                if (text.length > 0) {
-                    console.log("Matugen (normal) output:", text);
-                }
-            }
-        }
-
-        stderr: StdioCollector {
-            onStreamFinished: {
-                if (text.length > 0) {
-                    console.warn("Matugen (normal) error:", text);
-                }
-            }
-        }
-
-        onExited: {
-            console.log("Matugen normal finished");
-        }
-    }
-
-    // ── Clock auto-positioning ────────────────────────────────────────────────
-    // Runs clock_position.sh whenever the wallpaper changes (and clockEnabled is
-    // true). The script activates the Python venv, analyses the image (or its
-    // cached thumbnail for videos/GIFs), and patches clockX/clockY in
-    // desktop.json directly. Quickshell picks up the change through its normal
-    // FileView watch on that file.
-    Process {
-        id: clockPositionProcess
-        running: false
-        command: []
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                if (text.length > 0)
-                    console.log("[clock-pos] " + text.trim());
-            }
-        }
-
-        stderr: StdioCollector {
-            onStreamFinished: {
-                if (text.length > 0)
-                    console.warn("[clock-pos] " + text.trim());
-            }
-        }
-
-        onExited: function(exitCode) {
-            if (exitCode === 0)
-                console.log("[clock-pos] Position updated for:", wallpaper.currentWallpaper);
-            else
-                console.warn("[clock-pos] Script exited with code:", exitCode);
         }
     }
 
@@ -1091,40 +677,13 @@ PanelWindow {
                     usingFallback = false;
                     // Only update if the list has actually changed
                     var newFiles = files.sort();
-                    var listChanged = JSON.stringify(newFiles) !== JSON.stringify(wallpaperPaths);
-                    if (listChanged) {
+                    if (JSON.stringify(newFiles) !== JSON.stringify(wallpaperPaths)) {
                         console.log("Wallpaper directory updated. Found", newFiles.length, "images");
                         wallpaperPaths = newFiles;
-
-                        // Always try to load the saved wallpaper when list changes
-                        if (wallpaperPaths.length > 0) {
-                            // Trigger thumbnail generation if list changed
-                            if (delayedThumbnailGen.running)
-                                delayedThumbnailGen.restart();
-                            else
-                                delayedThumbnailGen.start();
-
-                            if (wallpaperConfig.adapter.currentWall) {
-                                var savedIndex = wallpaperPaths.indexOf(wallpaperConfig.adapter.currentWall);
-                                if (savedIndex !== -1) {
-                                    currentIndex = savedIndex;
-                                    console.log("Loaded saved wallpaper at index:", savedIndex);
-                                } else {
-                                    currentIndex = 0;
-                                    console.log("Saved wallpaper not found, using first");
-                                }
-                            } else {
-                                currentIndex = 0;
-                            }
-
-                            if (!initialLoadCompleted) {
-                                if (!wallpaperConfig.adapter.currentWall) {
-                                    wallpaperConfig.adapter.currentWall = wallpaperPaths[0];
-                                }
-                                initialLoadCompleted = true;
-                                // runMatugenForCurrentWallpaper() will be called by onCurrentWallChanged
-                            }
-                        }
+                        if (delayedThumbnailGen.running)
+                            delayedThumbnailGen.restart();
+                        else
+                            delayedThumbnailGen.start();
                     }
                 }
             }
@@ -1158,31 +717,8 @@ PanelWindow {
                 console.log("Using fallback wallpapers. Found", files.length, "images");
 
                 // Only use fallback if we don't already have main wallpapers loaded
-                if (usingFallback) {
+                if (usingFallback)
                     wallpaperPaths = files.sort();
-
-                    // Initialize fallback wallpaper selection
-                    if (wallpaperPaths.length > 0) {
-                        if (wallpaperConfig.adapter.currentWall) {
-                            var savedIndex = wallpaperPaths.indexOf(wallpaperConfig.adapter.currentWall);
-                            if (savedIndex !== -1) {
-                                currentIndex = savedIndex;
-                            } else {
-                                currentIndex = 0;
-                            }
-                        } else {
-                            currentIndex = 0;
-                        }
-
-                        if (!initialLoadCompleted) {
-                            if (!wallpaperConfig.adapter.currentWall) {
-                                wallpaperConfig.adapter.currentWall = wallpaperPaths[0];
-                            }
-                            initialLoadCompleted = true;
-                            // runMatugenForCurrentWallpaper() will be called by onCurrentWallChanged
-                        }
-                    }
-                }
             }
         }
     }
@@ -1222,270 +758,158 @@ PanelWindow {
         }
     }
 
-    Process {
-        id: applyPresetProcess
-        running: false
-        command: []
+    // ── Rendering (same design as end4-pC's Background.qml) ─────────────────────
+    // Two images + one GPU shader. The path comes straight from the shared config.json via
+    // ThemeLoader, so any change to it (this shell, end4's shell, a terminal) swaps the
+    // wallpaper. Videos are drawn by mpvpaper (switchwall.sh): this window stays empty.
+    //
+    // The two images are double-buffered: the new wallpaper loads into the idle one, the circle
+    // grows, then the roles swap. The old wallpaper is never decoded a second time.
+    readonly property string displayPath: currentIsVideo ? "" : currentWallpaper
+    property string shownPath: ""
+    property Item front: imageA          // what is on screen when idle
+    property Item back: imageB           // where the next wallpaper loads
+    property real transitionProgress: 0.0
+    property bool _transitionPending: false   // waiting for `back` to finish loading
+    readonly property bool shaderOk: transitionEffect.status !== ShaderEffect.Error
 
-        onExited: code => {
-            if (code === 0)
-                console.log("Color preset applied successfully");
-            else
-                console.warn("Failed to apply color preset, code:", code);
+    onDisplayPathChanged: _show(displayPath)
+
+    function _url(path) {
+        return path ? "file://" + path : "";
+    }
+
+    function _swap() {
+        var f = front;
+        front = back;
+        back = f;
+        back.source = "";
+        transitionProgress = 0.0; // idle = progress 0 = only `front` visible
+    }
+
+    function _show(path) {
+        // finish / drop whatever was in flight
+        if (transitionAnim.running) {
+            transitionAnim.stop();
+            _swap();
+        } else if (_transitionPending) {
+            _transitionPending = false;
+            back.source = "";
+        }
+        loadGuard.stop();
+
+        if (path === "") {
+            front.source = "";
+            shownPath = "";
+            return;
+        }
+        if (path === shownPath)
+            return;
+
+        if (shownPath === "" || Config.animDuration <= 0 || !shaderOk) {
+            front.source = _url(path);
+            shownPath = path;
+            return;
+        }
+
+        shownPath = path;
+        _transitionPending = true;
+        back.source = _url(path);
+        loadGuard.restart();
+        if (back.status === Image.Ready)
+            _beginReveal();
+    }
+
+    function _beginReveal() {
+        if (!_transitionPending)
+            return;
+        _transitionPending = false;
+        loadGuard.stop();
+        transitionProgress = 0.0;
+        transitionAnim.restart();
+    }
+
+    function _imageStatusChanged(img) {
+        if (img !== back || !_transitionPending)
+            return;
+        if (img.status === Image.Ready) {
+            _beginReveal();
+        } else if (img.status === Image.Error) {
+            // couldn't load: keep what is on screen
+            _transitionPending = false;
+            loadGuard.stop();
+            back.source = "";
         }
     }
 
-    Rectangle {
-        id: background
-        anchors.fill: parent
-        color: "black"
-        focus: true
-
-        Keys.onLeftPressed: {
-            if (wallpaper.wallpaperPaths.length > 0) {
-                wallpaper.previousWallpaper();
+    // never stay stuck waiting for an image
+    Timer {
+        id: loadGuard
+        interval: 4000
+        onTriggered: {
+            if (wallpaper._transitionPending) {
+                wallpaper._transitionPending = false;
+                wallpaper.back.source = "";
+                wallpaper.front.source = wallpaper._url(wallpaper.shownPath);
             }
         }
+    }
 
-        Keys.onRightPressed: {
-            if (wallpaper.wallpaperPaths.length > 0) {
-                wallpaper.nextWallpaper();
-            }
+    NumberAnimation {
+        id: transitionAnim
+        target: wallpaper
+        property: "transitionProgress"
+        from: 0.0
+        to: 1.0
+        duration: 1000
+        easing.type: Easing.InOutCubic
+        onFinished: wallpaper._swap()
+    }
+
+    component WallpaperImage: Image {
+        anchors.fill: parent
+        fillMode: Image.PreserveAspectCrop
+        cache: true
+        smooth: true
+        asynchronous: true
+        // Cap decode size at the screen's pixel width (huge wallpapers would otherwise stall the
+        // texture upload). Height follows the aspect ratio.
+        // (uses the screen size, which is known at creation, so the image never reloads when the window gets its size)
+        sourceSize.width: wallpaper.screen ? Math.ceil(wallpaper.screen.width * wallpaper.screen.devicePixelRatio) : 0
+        // As a layer the item renders to a texture with the crop applied; that texture is what the
+        // shader samples. Always on (like end4): toggling it with the source made the shader sample
+        // the raw uncropped texture during the transition, then jump to the cropped one at the swap.
+        layer.enabled: true
+        // Hidden normally: the ShaderEffect draws them. Fallback if the shader failed: draw `front` directly.
+        onStatusChanged: wallpaper._imageStatusChanged(this)
+    }
+
+    Item {
+        anchors.fill: parent
+
+        WallpaperImage {
+            id: imageA
+            visible: !wallpaper.shaderOk && wallpaper.front === imageA
         }
 
         WallpaperImage {
-            id: wallImage
+            id: imageB
+            visible: !wallpaper.shaderOk && wallpaper.front === imageB
+        }
+
+        ShaderEffect {
+            id: transitionEffect
             anchors.fill: parent
-            source: wallpaper.currentWallpaper
-        }
-    }
+            visible: wallpaper.shaderOk && wallpaper.shownPath !== ""
 
-    component TintableImage: Image {
-        id: tImg
-        property bool tint: false
-        property var paletteTexture: null
-        property real paletteCount: 0
+            property var fromImage: wallpaper.front
+            property var toImage: wallpaper.back
+            property real progress: wallpaper.transitionProgress
+            property real aspect: height > 0 ? width / height : 1.0
+            property vector2d origin: Qt.vector2d(0.5, 0.5)
+            property real softness: 0.12
 
-        mipmap: true
-        fillMode: Image.PreserveAspectCrop
-        asynchronous: true
-        smooth: true
-        sourceSize.width: wallpaper.width
-        sourceSize.height: wallpaper.height
-        layer.enabled: tint
-        layer.effect: ShaderEffect {
-            property var paletteTexture: tImg.paletteTexture
-            property real paletteSize: tImg.paletteCount
-            property real texWidth: tImg.width
-            property real texHeight: tImg.height
-
-            vertexShader: "palette.vert.qsb"
-            fragmentShader: "palette.frag.qsb"
-        }
-    }
-
-    component WallpaperImage: Item {
-        property string source
-        property string previousSource
-
-        Process {
-            id: killMpvpaperProcess
-            running: false
-            command: ["pkill", "-f", "mpvpaper"]
-
-            onExited: function (exitCode) {
-                console.log("Killed mpvpaper processes, exit code:", exitCode);
-            }
-        }
-
-        // Trigger animation when source changes
-        onSourceChanged: {
-            if (previousSource !== "" && source !== previousSource) {
-                if (Config.animDuration > 0) {
-                    transitionAnimation.restart();
-                }
-            }
-            previousSource = source;
-
-            // Kill mpvpaper if switching to a static image
-            if (source) {
-                var fileType = getFileType(source);
-                if (fileType === 'image') {
-                    killMpvpaperProcess.running = true;
-                }
-            }
-        }
-
-        SequentialAnimation {
-            id: transitionAnimation
-
-            ParallelAnimation {
-                NumberAnimation {
-                    target: wallImage
-                    property: "scale"
-                    to: 1.01
-                    duration: Config.animDuration
-                    easing.type: Easing.OutCubic
-                }
-                NumberAnimation {
-                    target: wallImage
-                    property: "opacity"
-                    to: 0.5
-                    duration: Config.animDuration
-                    easing.type: Easing.OutCubic
-                }
-            }
-
-            ParallelAnimation {
-                NumberAnimation {
-                    target: wallImage
-                    property: "scale"
-                    to: 1.0
-                    duration: Config.animDuration
-                    easing.type: Easing.OutCubic
-                }
-                NumberAnimation {
-                    target: wallImage
-                    property: "opacity"
-                    to: 1.0
-                    duration: Config.animDuration
-                    easing.type: Easing.OutCubic
-                }
-            }
-        }
-
-        Loader {
-            anchors.fill: parent
-            sourceComponent: {
-                if (!parent.source)
-                    return null;
-
-                var fileType = getFileType(parent.source);
-                if (fileType === 'image') {
-                    return staticImageComponent;
-                } else if (fileType === 'gif' || fileType === 'video') {
-                    return mpvpaperComponent;
-                }
-                return staticImageComponent; // fallback
-            }
-
-            property string sourceFile: parent.source
-        }
-
-        Component {
-            id: staticImageComponent
-            Item {
-                id: staticImageRoot
-                width: parent.width
-                height: parent.height
-                property string sourceFile: parent.sourceFile
-                property bool tint: wallpaper.tintEnabled
-
-                // Subset of colors for optimization (approx 25 colors vs 98)
-                readonly property var optimizedPalette: ["background", "overBackground", "shadow", "surface", "surfaceBright", "surfaceDim", "surfaceContainer", "surfaceContainerHigh", "surfaceContainerHighest", "surfaceContainerLow", "surfaceContainerLowest", "primary", "secondary", "tertiary", "red", "lightRed", "green", "lightGreen", "blue", "lightBlue", "yellow", "lightYellow", "cyan", "lightCyan", "magenta", "lightMagenta"]
-
-                // Palette generation for the tint shader
-                Item {
-                    id: paletteSourceItem
-                    visible: true
-                    width: staticImageRoot.optimizedPalette.length
-                    height: 1
-                    opacity: 0
-
-                    Row {
-                        anchors.fill: parent
-                        Repeater {
-                            model: staticImageRoot.optimizedPalette
-                            Rectangle {
-                                width: 1
-                                height: 1
-                                color: Colors[modelData]
-                            }
-                        }
-                    }
-                }
-
-                ShaderEffectSource {
-                    id: paletteTextureSource
-                    sourceItem: paletteSourceItem
-                    hideSource: true
-                    visible: false
-                    smooth: false
-                    recursive: false
-                }
-
-                TintableImage {
-                    anchors.fill: parent
-                    source: staticImageRoot.sourceFile ? "file://" + staticImageRoot.sourceFile : ""
-                    tint: staticImageRoot.tint
-                    paletteTexture: paletteTextureSource
-                    paletteCount: staticImageRoot.optimizedPalette.length
-                }
-            }
-        }
-
-        Component {
-            id: mpvpaperComponent
-            Item {
-                property string sourceFile: parent.sourceFile
-                property string scriptPath: decodeURIComponent(Qt.resolvedUrl("mpvpaper.sh").toString().replace("file://", ""))
-
-                Timer {
-                    id: mpvpaperRestartTimer
-                    interval: 100
-                    onTriggered: {
-                        if (sourceFile) {
-                            console.log("Restarting mpvpaper for:", sourceFile);
-                            mpvpaperProcess.running = true;
-                        }
-                    }
-                }
-
-                onSourceFileChanged: {
-                    if (sourceFile) {
-                        console.log("Source file changed to:", sourceFile);
-                        mpvpaperProcess.running = false;
-                        mpvpaperRestartTimer.restart();
-                    }
-                }
-
-                Component.onCompleted: {
-                    if (sourceFile) {
-                        console.log("Initial mpvpaper run for:", sourceFile);
-                        mpvpaperProcess.running = true;
-                    }
-                }
-
-                Component.onDestruction:
-                // mpvpaper script handles killing previous instances
-                {}
-
-                Process {
-                    id: mpvpaperProcess
-                    running: false
-                    command: sourceFile ? ["bash", scriptPath, sourceFile, (wallpaper.tintEnabled ? wallpaper.mpvShaderPath : "")] : []
-
-                    stdout: StdioCollector {
-                        onStreamFinished: {
-                            if (text.length > 0) {
-                                console.log("mpvpaper output:", text);
-                            }
-                        }
-                    }
-
-                    stderr: StdioCollector {
-                        onStreamFinished: {
-                            if (text.length > 0) {
-                                console.warn("mpvpaper error:", text);
-                            }
-                        }
-                    }
-
-                    onExited: function (exitCode) {
-                        console.log("mpvpaper process exited with code:", exitCode);
-                    }
-                }
-            }
+            fragmentShader: Qt.resolvedUrl("shaders/wallpaper_circle.frag.qsb")
         }
     }
 }
